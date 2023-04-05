@@ -40,17 +40,32 @@ import { PaymentHistoryContext } from "../../../services/paymentHistory/paymentH
 
 import { DealersContext } from "../../../services/dealers/dealers.context";
 import PaymentHistoryInfo from "../components/paymentHistory.info";
+import OrderHistoryInfo from "../components/orderHistory.info";
 import AddPaymentFormOverlay from "../../payment-details/addPaymentFormOverlay";
 import AddOrderFormOverlay from "../../order-details/addOrderFormOverlay";
+import { OrderHistoryContext } from "../../../services/orders/orderHistory.context";
 export default function DealerDetails({ navigation, route }) {
   const { dealer } = route.params;
   const navigateBack = () => {
     navigation.pop();
   };
-  const fetchOrderHistory = () => {
+  const {
+    orderHistory,
+    isOrderHistoryCallLoading,
+    orderHistoryCallError,
+    orderHistoryCallsucess,
+    fetchOrderHistoryByDealerId
+  } = useContext(OrderHistoryContext);
+  const fetchOrderHistory = (id) => {
     setOrderHistoryClicked(true);
     setButttonSelected("orderHistory");
-    renderTaost();
+   // renderTaost();
+    console.log("isOrderHistoryCallLoading is :", isOrderHistoryCallLoading);
+    console.log("orderListRender flag  is :", orderListRenderFlag);
+    fetchOrderHistoryByDealerId(id);
+    console.log("orderListRender flag  is :", orderListRenderFlag);
+    console.log("isOrderHistoryCallLoading is :", isOrderHistoryCallLoading);
+   
   };
   const renderTaost = () => {
     if (Platform.OS === "android") {
@@ -81,19 +96,44 @@ export default function DealerDetails({ navigation, route }) {
   const [AddOrderOverlayOpened, setAddOrderOverlayOpened] = useState(false);
   useEffect(() => {
     console.log(
-      "deleare details re-rendered, flatlist flag is :" +
-        flatListRenderFlag +
-        "Button selected is :" +
-        ButttonSelected
+      "deleare details re-rendered, paymentList flag is :" +
+      paymentListRenderFlag +
+      "Button selected is :" +
+      ButttonSelected
     );
+    console.log("orderListRender flag  is :", orderListRenderFlag);
   }, []);
   const fetchPaymentHistory = (id) => {
     setPaymentHistoryClicked(true);
     setButttonSelected("paymentHistory");
-    console.log("clicked button", paymentHistoryClicked);
-    fetchPaymentHistoryByDealerId(id);
+      console.log("isloading is :", isLoading);
+      console.log("paymentListRender flag  is :", paymentListRenderFlag);
+      fetchPaymentHistoryByDealerId(id);
+      console.log("paymentListRender flag  is :", paymentListRenderFlag);
+      console.log("isloading is :", isLoading);
+    
+   
   };
   const submitNewPayment = (paymentHistory) => {
+    console.log("inside submitNewPayment");
+    //fetchPaymentHistoryByDealerId(dealer.dealerId);
+    AddNewPaymentHistory(paymentHistory);
+    console.log("payment add sucess");
+    togglePaymentOverlay();
+    fetchPaymentHistoryByDealerId(dealer.dealerId);
+    console.log("payment history after additing payment is", paymentHistory);
+    if (paymentHistory != null && paymentHistory.length > 0) {
+      console.log("inside if block");
+      dealer.lastPaymentDate = paymentHistory[0].paymentDate;
+      console.log("last payment date is ", dealer.lastPaymentDate);
+    }
+    dealer.lastPaymentDate = paymentHistory.paymentDate;
+    updateDelearDueAmountById(dealer);
+    console.log("dealer info uploaded after payment add");
+    console.log("is loading is " + isLoading);
+
+  };
+  const submitNewPaymentPrev = (paymentHistory) => {
     console.log("inside submitNewPayment");
     fetchPaymentHistoryByDealerId(dealer.dealerId);
     console.log("sucess was", sucess);
@@ -121,25 +161,26 @@ export default function DealerDetails({ navigation, route }) {
   const togglePaymentOverlay = () => {
     console.log("inside togle method");
     console.log(
-      "deleare details re-rendered, flatlist flag is :" +
-        flatListRenderFlag +
-        "Button selected is :" +
-        ButttonSelected
+      "deleare details re-rendered, payment list flag is :" +
+      paymentListRenderFlag +
+      "Button selected is :" +
+      ButttonSelected
     );
     setAddPaymentOverlayOpened(!AddPaymentOverlayOpened);
   };
   const toggleOrderOverlay = () => {
     console.log("inside togle order overlay method");
     console.log(
-      "deleare details re-rendered, flatlist flag is :" +
-        flatListRenderFlag +
-        "Button selected is :" +
-        ButttonSelected
+      "deleare details re-rendered, paymentlist flag is :" +
+      paymentListRenderFlag +
+      "Button selected is :" +
+      ButttonSelected
     );
     setAddOrderOverlayOpened(!AddOrderOverlayOpened);
   };
-  const flatListRenderFlag = ButttonSelected === "paymentHistory" && !isLoading;
-  const LoadingIndicatorRenderFlag = isLoading;
+  const paymentListRenderFlag = ButttonSelected === "paymentHistory" && !isLoading;
+  const orderListRenderFlag = ButttonSelected === "orderHistory" && !isOrderHistoryCallLoading;
+  const LoadingIndicatorRenderFlag = isLoading || isOrderHistoryCallLoading;
   return (
     <MainView>
       <DividertertiarySmall />
@@ -227,7 +268,7 @@ export default function DealerDetails({ navigation, route }) {
             </View>
           )}
         </TouchableOpacity>
-        <TouchableOpacity style={{ flex: 1 }} onPress={fetchOrderHistory}>
+        <TouchableOpacity style={{ flex: 1 }} onPress={()=>fetchOrderHistory(dealer.dealerId)}>
           {ButttonSelected === "orderHistory" ? (
             <View
               style={{
@@ -264,7 +305,7 @@ export default function DealerDetails({ navigation, route }) {
         </TouchableOpacity>
       </CustomTabView>
 
-      {flatListRenderFlag ? (
+      {paymentListRenderFlag ? (
         <>
           <DividertertiarySmall />
 
@@ -294,7 +335,41 @@ export default function DealerDetails({ navigation, route }) {
           />
         )
       )}
+  {orderListRenderFlag ? (
+        <>
+          <DividertertiarySmall />
+
+          <ScrollView>
+            {orderHistory.map((item) => {
+              return <OrderHistoryInfo orderDetails={item} />;
+            })}
+          </ScrollView>
+        </>
+      ) : (
+        // <FlatList
+        //   data={paymentHistory}
+        //   renderItem={({ item }) => {
+        //     console.log(
+        //       "payment date is",
+        //       new Date(item.paymentDateTimestamp.seconds * 1000)
+        //     );
+        //     return <PaymentHistoryInfo paymentDetails={item} />;
+        //   }}
+        //   keyExtractor={(item) => item.pmtId}
+        // />
+        LoadingIndicatorRenderFlag && (
+          <ActivityIndicator
+            style={{ marginTop: 8 }}
+            size="large"
+            color="#138000"
+          />
+        )
+      )}
+
+
+
       {error && <Text>error</Text>}
+
       {AddPaymentOverlayOpened && (
         <AddPaymentFormOverlay
           togglePaymentOverlay={togglePaymentOverlay}

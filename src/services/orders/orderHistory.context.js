@@ -1,4 +1,4 @@
-import React, { useState, createContext } from "react";
+import React, { useState, createContext,useEffect } from "react";
 import {
   GetOrderHistoryByDealerId,
   AddNewOrderService,
@@ -11,12 +11,15 @@ export const OrderHistoryContextProvider = ({ children }) => {
   const [orderHistory, setOrderHistory] = useState(null);
   const [error, setError] = useState(null);
   const [sucess, setSucess] = useState(false);
+  const [isOrderHistoryCallLoading, setIsOrderHistoryCallLoading] = useState(false);
+  const [orderHistoryCallError, setOrderHistoryCallError] = useState(false);
+  const [orderHistoryCallsucess, setOrderHistoryCallsucess] = useState(false);
   const [addNewOrderSucess, setAddNewOrderSucess] = useState(false);
   const [addNewOrderApiCallInprogress, setAddNewOrderApiCallInprogress] =
     useState(false);
-
+    
   const fetchOrderHistoryByDealerId = (dealerId) => {
-    setIsLoading(true);
+    setIsOrderHistoryCallLoading(true);
     console.log(
       "in function fetch fetchOrderHistoryByDealerId in context dealer id ",
       dealerId
@@ -31,13 +34,13 @@ export const OrderHistoryContextProvider = ({ children }) => {
         });
         setOrderHistory(orderHistoryList);
         console.log("orderHistoryList fron db is ", orderHistoryList);
-        setIsLoading(false);
-        setSucess(true);
+        setIsOrderHistoryCallLoading(false);
+        setOrderHistoryCallsucess(true);
       })
       .catch((e) => {
         setSucess(false);
-        setIsLoading(false);
-        setError(e.toString());
+        setIsOrderHistoryCallLoading(false);
+        setOrderHistoryCallError(e.toString());
         console.log(e);
       });
   };
@@ -83,6 +86,9 @@ export const OrderHistoryContextProvider = ({ children }) => {
         addNewOrderSucess,
         fetchOrderHistoryByDealerId,
         AddNewOrder,
+        isOrderHistoryCallLoading,
+        orderHistoryCallError,
+        orderHistoryCallsucess
       }}
     >
       {children}

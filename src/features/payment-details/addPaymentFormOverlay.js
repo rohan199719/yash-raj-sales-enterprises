@@ -130,6 +130,26 @@ export default function AddPaymentFormOverlay({
       return;
     }
   };
+  const handleSubmitPrev = () => {
+    if (isInputValid()) {
+      const remainingDue = Number(dealer.dueAmount) - Number(PaidAmount);
+      console.log("remaining diue amount is ", remainingDue);
+      const newPaymentHistory = {
+        dealerId: dealer.dealerId,
+        dealerName: dealer.name,
+        dueAmount: remainingDue,
+        paymentAmount: PaidAmount,
+        remark: Notes,
+        paymentDate: PaymentDate,
+        paymentDateTimestamp: Timestamp.fromDate(mydate),
+      };
+      dealer.dueAmount = remainingDue;
+      submitNewPayment(newPaymentHistory);
+    } else {
+      console.log("error flag is " + inputValidationError);
+      return;
+    }
+  };
   const changeSelectedDate = (event, selectedDate) => {
     const currentDate = selectedDate || mydate;
     setDate(currentDate);

@@ -148,6 +148,11 @@ export default function AddOrderFormOverlay({ toggleOrderOverlay, dealer }) {
       setInputValidationError("net Billing Amount invalid");
       return false;
     }
+    if (netBillingAmmount<=0) {
+      console.log("net Billing Amount shold not be zero,please add least one product");
+      setInputValidationError("please add least one product");
+      return false;
+    }
     return true;
   };
 
@@ -263,348 +268,377 @@ export default function AddOrderFormOverlay({ toggleOrderOverlay, dealer }) {
         orderDateTimestamp: Timestamp.fromDate(mydate),
       };
       AddNewOrderCall(newOrder);
-      console.log("addNewOrderSucess is ", addNewOrderSucess);
-      while (addNewOrderApiCallInprogress) {
-        console.log("isLaoding loop to wait");
-        continue;
-      }
-      if (addNewOrderSucess) {
-        console.log("AddNewOrderCall sucess");
-        const newDueAmount =
-          Number(dealer.dueAmount) + Number(netBillingAmmount);
-        dealer.dueAmount = newDueAmount;
-        dealer.lastOrderDate = orderDate;
-        updateDelearDueAmountById(dealer);
+      console.log("AddNewOrderCall sucess");
+      const newDueAmount =
+        Number(dealer.dueAmount) + Number(netBillingAmmount);
+      dealer.dueAmount = newDueAmount;
+      dealer.lastOrderDate = orderDate;
+      updateDelearDueAmountById(dealer);
 
-        console.log("dealer due ammount add sucess");
-        renderTaost("order added sucessfully");
-        toggleOrderOverlay();
-        //fetchPaymentHistoryByDealerId(dealer.dealerId);
-        console.log("is loading is " + isLoading);
-      } else {
-        console.log("AddNewOrderCall failed");
-      }
-    } else {
-      console.log("error flag is " + inputValidationError);
-      return;
-    }
+      console.log("dealer due ammount add sucess");
+      renderTaost("order added sucessfully");
+      toggleOrderOverlay();
+      fetchOrderHistoryByDealerId(dealer.dealerId);
+      console.log("is loading is " + isLoading);
+   
+  } else {
+    console.log("error flag is " + inputValidationError);
+    return;
+}
   };
-
-  const AddNewOrderCall = (newOrder) => {
-    AddNewOrder(newOrder);
-  };
-
-  const calculateNetPrice = (quantity, pricePerUnit) => {
-    (quantity, pricePerUnit) => {
-      setNetPrice((Number(quantity) * Number(pricePerUnit)).toString());
+const handleSubmitPrev = () => {
+  if (isInputValid()) {
+    const newOrder = {
+      dealerId: dealer.dealerId,
+      dealerName: dealer.name,
+      orderedProducts: orderedProduct,
+      netBillingAmount: netBillingAmmount,
+      Notes: Notes,
+      orderDate: orderDate,
+      orderDateTimestamp: Timestamp.fromDate(mydate),
     };
-  };
-  const changeSelectedDate = (event, selectedDate) => {
-    const currentDate = selectedDate || mydate;
-    setDate(currentDate);
-    const dateString =
-      currentDate.getDate() +
-      "/" +
-      parseInt(currentDate.getMonth() + 1) +
-      "/" +
-      currentDate.getFullYear();
-    setOrderDate(dateString);
-    console.log("selectd Date is", selectedDate);
-    console.log("order Date is", dateString);
-    setDisplayDatePicker(false);
-  };
+    AddNewOrderCall(newOrder);
+    console.log("addNewOrderSucess is ", addNewOrderSucess);
+    while (addNewOrderApiCallInprogress) {
+      console.log("isLaoding loop to wait");
+      continue;
+    }
+    if (addNewOrderSucess) {
+      console.log("AddNewOrderCall sucess");
+      const newDueAmount =
+        Number(dealer.dueAmount) + Number(netBillingAmmount);
+      dealer.dueAmount = newDueAmount;
+      dealer.lastOrderDate = orderDate;
+      updateDelearDueAmountById(dealer);
 
-  const openDatePicker = () => {
-    setDisplayDatePicker(true);
-  };
+      console.log("dealer due ammount add sucess");
+      renderTaost("order added sucessfully");
+      toggleOrderOverlay();
+      //fetchPaymentHistoryByDealerId(dealer.dealerId);
+      console.log("is loading is " + isLoading);
+    } else {
+      console.log("AddNewOrderCall failed");
+    }
+  } else {
+    console.log("error flag is " + inputValidationError);
+    return;
+  }
+};
+const AddNewOrderCall = (newOrder) => {
+  AddNewOrder(newOrder);
+};
 
-  useEffect(() => {
-    calculateNetBilingAmount();
-    console.log("addNewOrderSucess is", addNewOrderSucess);
-  });
-  return (
-    <Overlay>
-      <MainView>
-        <HeaderElement>
-          <Text variant="title">Add New Order</Text>
-          <TouchableOpacity onPress={toggleOrderOverlay}>
-            <FontAwesome name="close" size={24} color="green" />
-          </TouchableOpacity>
-        </HeaderElement>
-        {true ? (
-          <ErrorMessageView>
-            <Text variant="error">{inputValidationError}</Text>
-          </ErrorMessageView>
-        ) : null}
-        <ScrollView
-          style={{
-            flex: 1,
-            marginTop: 20,
-          }}
-          contentContainerStyle={{
-            alignItems: "center",
-            justifyContent: "flex-start",
-          }}
-        >
-          <FormView>
+const calculateNetPrice = (quantity, pricePerUnit) => {
+  (quantity, pricePerUnit) => {
+    setNetPrice((Number(quantity) * Number(pricePerUnit)).toString());
+  };
+};
+const changeSelectedDate = (event, selectedDate) => {
+  const currentDate = selectedDate || mydate;
+  setDate(currentDate);
+  const dateString =
+    currentDate.getDate() +
+    "/" +
+    parseInt(currentDate.getMonth() + 1) +
+    "/" +
+    currentDate.getFullYear();
+  setOrderDate(dateString);
+  console.log("selectd Date is", selectedDate);
+  console.log("order Date is", dateString);
+  setDisplayDatePicker(false);
+};
+
+const openDatePicker = () => {
+  setDisplayDatePicker(true);
+};
+
+useEffect(() => {
+  calculateNetBilingAmount();
+  console.log("addNewOrderSucess is", addNewOrderSucess);
+});
+return (
+  <Overlay>
+    <MainView>
+      <HeaderElement>
+        <Text variant="title">Add New Order</Text>
+        <TouchableOpacity onPress={toggleOrderOverlay}>
+          <FontAwesome name="close" size={24} color="green" />
+        </TouchableOpacity>
+      </HeaderElement>
+      {true ? (
+        <ErrorMessageView>
+          <Text variant="error">{inputValidationError}</Text>
+        </ErrorMessageView>
+      ) : null}
+      <ScrollView
+        style={{
+          flex: 1,
+          marginTop: 20,
+        }}
+        contentContainerStyle={{
+          alignItems: "center",
+          justifyContent: "flex-start",
+        }}
+      >
+        <FormView>
+          <TextInput
+            style={{
+              width: "100%",
+              backgroundColor: "#DCEDC8",
+              marginTop: 8,
+              opacity: 0.6,
+            }}
+            label="Dealer Id"
+            value={dealer.dealerId}
+            disabled="true"
+            textColor="#689F38"
+            activeUnderlineColor="#689F38"
+          />
+          <TextInput
+            style={{
+              width: "100%",
+              backgroundColor: "#DCEDC8",
+              marginTop: 8,
+              opacity: 0.6,
+            }}
+            label="Dealer Name"
+            value={dealer.name.toUpperCase()}
+            disabled="true"
+            textColor="#689F38"
+            activeUnderlineColor="#689F38"
+          />
+          <View
+            style={{
+              width: "100%",
+              backgroundColor: "#DCEDC8",
+              marginTop: 8,
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
             <TextInput
               style={{
-                width: "100%",
+                flex: 1,
+                underlineColorAndroid: "transparent",
                 backgroundColor: "#DCEDC8",
-                marginTop: 8,
-                opacity: 0.6,
               }}
-              label="Dealer Id"
-              value={dealer.dealerId}
+              label="Order Date"
+              value={orderDate}
+              onChangeText={(txt) => {
+                setOrderDate(txt);
+              }}
               disabled="true"
               textColor="#689F38"
               activeUnderlineColor="#689F38"
             />
-            <TextInput
-              style={{
-                width: "100%",
-                backgroundColor: "#DCEDC8",
-                marginTop: 8,
-                opacity: 0.6,
-              }}
-              label="Dealer Name"
-              value={dealer.name.toUpperCase()}
-              disabled="true"
-              textColor="#689F38"
-              activeUnderlineColor="#689F38"
-            />
-            <View
-              style={{
-                width: "100%",
-                backgroundColor: "#DCEDC8",
-                marginTop: 8,
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
+            <TouchableOpacity onPress={openDatePicker}>
+              <MaterialIcons name="date-range" size={24} color="#689F38" />
+            </TouchableOpacity>
+          </View>
+          <Divider />
+
+          <AddedItemTable
+            product={orderedProduct}
+            deleteAddedProduct={deleteAddedProduct}
+          />
+          <Divider />
+          {newItemFormRenderFlag ? (
+            <ProductInput>
               <TextInput
                 style={{
-                  flex: 1,
-                  underlineColorAndroid: "transparent",
+                  width: "100%",
                   backgroundColor: "#DCEDC8",
+                  marginHorizontal: 8,
                 }}
-                label="Order Date"
-                value={orderDate}
+                label={<Text style={{ fontSize: 15 }}>Product Name</Text>}
+                value={productName}
                 onChangeText={(txt) => {
-                  setOrderDate(txt);
+                  setProductName(txt);
                 }}
-                disabled="true"
                 textColor="#689F38"
                 activeUnderlineColor="#689F38"
               />
-              <TouchableOpacity onPress={openDatePicker}>
-                <MaterialIcons name="date-range" size={24} color="#689F38" />
-              </TouchableOpacity>
-            </View>
-            <Divider />
-
-            <AddedItemTable
-              product={orderedProduct}
-              deleteAddedProduct={deleteAddedProduct}
-            />
-            <Divider />
-            {newItemFormRenderFlag ? (
-              <ProductInput>
+              <ProductInputSubViewTop>
                 <TextInput
                   style={{
-                    width: "100%",
+                    flex: 1,
                     backgroundColor: "#DCEDC8",
-                    marginHorizontal: 8,
+                    marginRight: 8,
                   }}
-                  label={<Text style={{ fontSize: 15 }}>Product Name</Text>}
-                  value={productName}
+                  label={<Text style={{ fontSize: 12 }}>Units</Text>}
+                  value={quantity}
                   onChangeText={(txt) => {
-                    setProductName(txt);
+                    setQuantity(txt);
+                    setNetPrice(
+                      (Number(txt) * Number(pricePerUnit)).toString()
+                    );
+                  }}
+                  keyboardType="number-pad"
+                  textColor="#689F38"
+                  activeUnderlineColor="#689F38"
+                />
+                <TextInput
+                  style={{
+                    flex: 1,
+                    backgroundColor: "#DCEDC8",
+                    marginRight: 8,
+                  }}
+                  label={<Text style={{ fontSize: 12 }}>Unit Name</Text>}
+                  value={unitName}
+                  onChangeText={(txt) => {
+                    setUnitName(txt);
                   }}
                   textColor="#689F38"
                   activeUnderlineColor="#689F38"
                 />
-                <ProductInputSubViewTop>
-                  <TextInput
-                    style={{
-                      flex: 1,
-                      backgroundColor: "#DCEDC8",
-                      marginRight: 8,
-                    }}
-                    label={<Text style={{ fontSize: 12 }}>Units</Text>}
-                    value={quantity}
-                    onChangeText={(txt) => {
-                      setQuantity(txt);
-                      setNetPrice(
-                        (Number(txt) * Number(pricePerUnit)).toString()
-                      );
-                    }}
-                    keyboardType="number-pad"
-                    textColor="#689F38"
-                    activeUnderlineColor="#689F38"
-                  />
-                  <TextInput
-                    style={{
-                      flex: 1,
-                      backgroundColor: "#DCEDC8",
-                      marginRight: 8,
-                    }}
-                    label={<Text style={{ fontSize: 12 }}>Unit Name</Text>}
-                    value={unitName}
-                    onChangeText={(txt) => {
-                      setUnitName(txt);
-                    }}
-                    textColor="#689F38"
-                    activeUnderlineColor="#689F38"
-                  />
-                  <TextInput
-                    style={{
-                      flex: 1,
-                      backgroundColor: "#DCEDC8",
-                    }}
-                    label={<Text style={{ fontSize: 12 }}>Price/unit</Text>}
-                    value={pricePerUnit}
-                    onChangeText={(txt) => {
-                      setPricePerUnit(txt);
-                      setNetPrice((Number(quantity) * Number(txt)).toString());
-                    }}
-                    keyboardType="number-pad"
-                    textColor="#689F38"
-                    activeUnderlineColor="#689F38"
-                  />
-                </ProductInputSubViewTop>
+                <TextInput
+                  style={{
+                    flex: 1,
+                    backgroundColor: "#DCEDC8",
+                  }}
+                  label={<Text style={{ fontSize: 12 }}>Price/unit</Text>}
+                  value={pricePerUnit}
+                  onChangeText={(txt) => {
+                    setPricePerUnit(txt);
+                    setNetPrice((Number(quantity) * Number(txt)).toString());
+                  }}
+                  keyboardType="number-pad"
+                  textColor="#689F38"
+                  activeUnderlineColor="#689F38"
+                />
+              </ProductInputSubViewTop>
 
-                <ProductInputSubViewBottom>
-                  <TextInput
-                    style={{
-                      flex: 2,
-                      backgroundColor: "#DCEDC8",
-                    }}
-                    label={<Text style={{ fontSize: 15 }}>Net Price</Text>}
-                    value={netPrice}
-                    disabled="true"
-                    keyboardType="number-pad"
-                    textColor="#689F38"
-                    activeUnderlineColor="#689F38"
-                  />
-                  <View
-                    style={{
-                      flex: 1,
-
-                      flexDirection: "row",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <TouchableOpacity onPress={handleAddNewOrder}>
-                      <View
-                        style={{
-                          justifyContent: "center",
-                          alignItems: "center",
-                          borderWidth: 2,
-                          borderRadius: 4,
-                          borderColor: "#689F38",
-                          padding: 2,
-                          width: 80,
-                          height: 44,
-                          backgroundColor: "white",
-                        }}
-                      >
-                        <Text variant="title">Add</Text>
-                      </View>
-                    </TouchableOpacity>
-                  </View>
-                </ProductInputSubViewBottom>
-                <ErrorMessageView>
-                  <Text variant="error">{productInputValidationError}</Text>
-                </ErrorMessageView>
-              </ProductInput>
-            ) : null}
-            <Divider />
-            {addMoreButtomRenderFlag ? (
-              <TouchableOpacity
-                style={{ marginRight: 8 }}
-                onPress={renderNewOrderForm}
-                disabled={newItemFormRenderFlag}
-              >
+              <ProductInputSubViewBottom>
+                <TextInput
+                  style={{
+                    flex: 2,
+                    backgroundColor: "#DCEDC8",
+                  }}
+                  label={<Text style={{ fontSize: 15 }}>Net Price</Text>}
+                  value={netPrice}
+                  disabled="true"
+                  keyboardType="number-pad"
+                  textColor="#689F38"
+                  activeUnderlineColor="#689F38"
+                />
                 <View
                   style={{
+                    flex: 1,
+
+                    flexDirection: "row",
                     justifyContent: "center",
                     alignItems: "center",
-                    borderWidth: 2,
-                    borderRadius: 4,
-                    borderColor: "#689F38",
-                    padding: 2,
                   }}
                 >
-                  <Fontisto
-                    name="shopping-basket-add"
-                    size={25}
-                    color="#689F38"
-                  />
-                  <Text variant="caption">Add more</Text>
+                  <TouchableOpacity onPress={handleAddNewOrder}>
+                    <View
+                      style={{
+                        justifyContent: "center",
+                        alignItems: "center",
+                        borderWidth: 2,
+                        borderRadius: 4,
+                        borderColor: "#689F38",
+                        padding: 2,
+                        width: 80,
+                        height: 44,
+                        backgroundColor: "white",
+                      }}
+                    >
+                      <Text variant="title">Add</Text>
+                    </View>
+                  </TouchableOpacity>
                 </View>
-              </TouchableOpacity>
-            ) : null}
-            <TextInput
-              style={{
-                width: "100%",
-                backgroundColor: "#DCEDC8",
-                marginTop: 8,
-              }}
-              label="Net Billing Amount"
-              value={netBillingAmmount}
-              disabled="true"
-              textColor="#689F38"
-              activeUnderlineColor="#689F38"
+              </ProductInputSubViewBottom>
+              <ErrorMessageView>
+                <Text variant="error">{productInputValidationError}</Text>
+              </ErrorMessageView>
+            </ProductInput>
+          ) : null}
+          <Divider />
+          {addMoreButtomRenderFlag ? (
+            <TouchableOpacity
+              style={{ marginRight: 8 }}
+              onPress={renderNewOrderForm}
+              disabled={newItemFormRenderFlag}
+            >
+              <View
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderWidth: 2,
+                  borderRadius: 4,
+                  borderColor: "#689F38",
+                  padding: 2,
+                }}
+              >
+                <Fontisto
+                  name="shopping-basket-add"
+                  size={25}
+                  color="#689F38"
+                />
+                <Text variant="caption">Add more</Text>
+              </View>
+            </TouchableOpacity>
+          ) : null}
+          <TextInput
+            style={{
+              width: "100%",
+              backgroundColor: "#DCEDC8",
+              marginTop: 8,
+            }}
+            label="Net Billing Amount"
+            value={netBillingAmmount}
+            disabled="true"
+            textColor="#689F38"
+            activeUnderlineColor="#689F38"
+          />
+          {isDisplayDatePicker && (
+            <DateTimePicker
+              testID="dateTimePicker"
+              value={mydate}
+              mode={displaymode}
+              is24Hour={true}
+              display="default"
+              onChange={changeSelectedDate}
             />
-            {isDisplayDatePicker && (
-              <DateTimePicker
-                testID="dateTimePicker"
-                value={mydate}
-                mode={displaymode}
-                is24Hour={true}
-                display="default"
-                onChange={changeSelectedDate}
-              />
-            )}
-            <TextInput
-              style={{
-                width: "100%",
-                backgroundColor: "#DCEDC8",
-                marginTop: 8,
-              }}
-              label="Notes"
-              value={Notes}
-              onChangeText={(txt) => {
-                setNotes(txt);
-              }}
-              multiline={true}
-              textColor="#689F38"
-              activeUnderlineColor="#689F38"
-            />
-            <TextInput
-              style={{
-                width: "100%",
-                backgroundColor: "#DCEDC8",
-                marginTop: 8,
-              }}
-              label="Autherization PIN"
-              value={AuthPIN}
-              onChangeText={(txt) => {
-                setAuthPIN(txt);
-              }}
-              secureTextEntry
-              textColor="#689F38"
-              activeUnderlineColor="#689F38"
-            />
-          </FormView>
-        </ScrollView>
-        <SubmitButton onPress={handleSubmit}>
-          <SubmitButtonText>Submit</SubmitButtonText>
-        </SubmitButton>
-      </MainView>
-    </Overlay>
-  );
+          )}
+          <TextInput
+            style={{
+              width: "100%",
+              backgroundColor: "#DCEDC8",
+              marginTop: 8,
+            }}
+            label="Notes"
+            value={Notes}
+            onChangeText={(txt) => {
+              setNotes(txt);
+            }}
+            multiline={true}
+            textColor="#689F38"
+            activeUnderlineColor="#689F38"
+          />
+          <TextInput
+            style={{
+              width: "100%",
+              backgroundColor: "#DCEDC8",
+              marginTop: 8,
+            }}
+            label="Autherization PIN"
+            value={AuthPIN}
+            onChangeText={(txt) => {
+              setAuthPIN(txt);
+            }}
+            secureTextEntry
+            textColor="#689F38"
+            activeUnderlineColor="#689F38"
+          />
+        </FormView>
+      </ScrollView>
+      <SubmitButton onPress={handleSubmit}>
+        <SubmitButtonText>Submit</SubmitButtonText>
+      </SubmitButton>
+    </MainView>
+  </Overlay>
+);
 }
