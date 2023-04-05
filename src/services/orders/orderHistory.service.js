@@ -25,6 +25,24 @@ export const GetOrderHistoryByDealerId = (d_id) => {
   return getDocs(q);
 };
 
+export const GetOrderHistory = () => {
+  console.log(
+    "in service GetOrderHistory");
+  const db = getFirestore();
+  const colref = collection(db, "orders");
+  var now = new Date();
+  const thirtyDayAgo = new Date().setDate(now.getDate()-30);
+  console.log(thirtyDayAgo.valueOf());
+
+  const q = query(
+    colref,
+    where("orderDateTimestampString", ">=", thirtyDayAgo.valueOf()),
+    orderBy("orderDateTimestampString", "desc")
+  );
+  return getDocs(q);
+};
+
+
 export const AddNewOrderService = (newOrder) => {
   console.log(
     "in service AddOrderHistory method with dealerId",

@@ -15,7 +15,7 @@ import {
   TopView,
 } from "./paymentHistory.info.style";
 import { ToastAndroid, Platform, AlertIOS } from "react-native";
-export default function OrderHistoryInfo({ orderDetails = {} }) {
+export default function OrderHistoryDetailedInfo({ orderDetails = {} }) {
   const months = [
     "JAN",
     "FEB",
@@ -44,6 +44,7 @@ export default function OrderHistoryInfo({ orderDetails = {} }) {
     netBillingAmount = "test123",
     dealerName = "default",
     orderDateTimestamp = "test123",
+    orderDateTimestampString="test123",
     Notes = "test",
   } = orderDetails;
   const renderTaost = () => {
@@ -54,7 +55,7 @@ export default function OrderHistoryInfo({ orderDetails = {} }) {
     }
   };
 
-  console.log("order history card page loaded");
+  console.log("order history detailed card page loaded");
   return (
     <MainContainer>
       <TimeSection>

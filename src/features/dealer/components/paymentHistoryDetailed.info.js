@@ -15,7 +15,7 @@ import {
   TopView,
 } from "./paymentHistory.info.style";
 import { ToastAndroid, Platform, AlertIOS } from "react-native";
-export default function OrderHistoryInfo({ orderDetails = {} }) {
+export default function PaymentHistoryDetailedInfo({ paymentDetails = {} }) {
   const months = [
     "JAN",
     "FEB",
@@ -41,11 +41,15 @@ export default function OrderHistoryInfo({ orderDetails = {} }) {
   ];
   const {
     dealerId = "test123",
-    netBillingAmount = "test123",
+    createdDateTimestamp = "test123",
+    paymentAmount = "test123",
+    DueAmount = "test123",
     dealerName = "default",
-    orderDateTimestamp = "test123",
-    Notes = "test",
-  } = orderDetails;
+    dueAmount = "test123",
+    paymentDateTimestamp = "test123",
+    paymentDateTimestampString="test123",
+    remark = "test",
+  } = paymentDetails;
   const renderTaost = () => {
     if (Platform.OS === "android") {
       ToastAndroid.show("coming soon", ToastAndroid.SHORT);
@@ -54,25 +58,25 @@ export default function OrderHistoryInfo({ orderDetails = {} }) {
     }
   };
 
-  console.log("order history card page loaded");
+  console.log("history card page loaded");
   return (
     <MainContainer>
       <TimeSection>
         <View style={{}}>
           <Text variant="caption">
-            {months[orderDateTimestamp.toDate().getMonth()]}{" "}
-            {orderDateTimestamp.toDate().getDate().toString()}
+            {months[paymentDateTimestamp.toDate().getMonth()]}{" "}
+            {paymentDateTimestamp.toDate().getDate().toString()}
           </Text>
         </View>
         <View style={{}}>
           <Text variant="caption">
-            {/* {months[orderDateTimestamp.toDate().getMonth()]} */}
-            {orderDateTimestamp.toDate().getFullYear()}
+            {/* {months[paymentDateTimestamp.toDate().getMonth()]} */}
+            {paymentDateTimestamp.toDate().getFullYear()}
           </Text>
         </View>
         <View style={{}}>
           <Text variant="labelSmall">
-            {days[orderDateTimestamp.toDate().getDay()]}
+            {days[paymentDateTimestamp.toDate().getDay()]}
           </Text>
         </View>
       </TimeSection>
@@ -96,28 +100,28 @@ export default function OrderHistoryInfo({ orderDetails = {} }) {
             }}
           >
             <Text variant="title" adjustsFontSizeToFit numberOfLines={1}>
-              Billing Amount: {netBillingAmount}
+              Amount Paid : {paymentAmount}
             </Text>
           </View>
 
-          {/* <Text
+          <Text
             style={{ width: "36%" }}
             variant="error"
             adjustsFontSizeToFit
             numberOfLines={1}
           >
             Due amount : {dueAmount}
-          </Text> */}
+          </Text>
         </TopView>
         <BottomView>
           <TouchableOpacity onPress={renderTaost}>
-            <Text variant="labelSmall">View Notes</Text>
+            <Text variant="labelSmall">View comments</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={{ flexDirection: "row" }}
             onPress={renderTaost}
           >
-            <Text variant="labelSmall">ordered items{"   "}</Text>
+            <Text variant="labelSmall">Receipt{"   "}</Text>
             <FontAwesome5 name="receipt" size={16} color="#689F38" />
           </TouchableOpacity>
         </BottomView>

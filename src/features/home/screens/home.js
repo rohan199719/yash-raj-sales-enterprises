@@ -13,15 +13,30 @@ import { BackgroundImage } from "../../authentication/screens/welcome.style";
 import { useContext } from "react";
 import { Searchbar } from "react-native-paper";
 import { DealersContext } from "../../../services/dealers/dealers.context";
+import { PaymentHistoryContext } from "../../../services/paymentHistory/paymentHistory.context";
+import { OrderHistoryContext } from "../../../services/orders/orderHistory.context";
 export default function Home({ navigation }) {
   const { dealers, isLoading, error, fetchDealers } =
     useContext(DealersContext);
-
+    const { paymentHistory, isLaoding, fetchPaymentHistory } =
+    useContext(PaymentHistoryContext);
+    const {fetchOrderHistory} =
+    useContext(OrderHistoryContext);
   const navigateToDealerPage = () => {
     fetchDealers();
     navigation.navigate("Dealers");
   };
 
+  const navigateToPaymentHistoryPage = () => {
+    fetchPaymentHistory();
+    navigation.navigate("Payments");
+  };
+
+  const navigateToOrderHistoryPage = () => {
+    fetchOrderHistory();
+    navigation.navigate("Orders");
+  };
+  
   return (
     <BackgroundImage>
       <View style={styles.homeContainer}>
@@ -38,14 +53,14 @@ export default function Home({ navigation }) {
 
         <View style={styles.buttonContainer}>
           <View style={styles.topButtonContainer}>
-            <TouchableOpacity style={styles.topButton1}>
+            <TouchableOpacity style={styles.topButton1} onPress={navigateToPaymentHistoryPage}>
               <Image
                 source={require("../../../../assets/paymentHistoryIcon-removebg-preview.png")}
                 style={styles.imagePaymentHistory}
               />
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.topButton2}>
+            <TouchableOpacity style={styles.topButton2} onPress={navigateToOrderHistoryPage}>
               <Image
                 source={require("../../../../assets/orderHistoryIcon-removebg-preview.png")}
                 style={styles.imagePaymentHistory}

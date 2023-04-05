@@ -13,6 +13,13 @@ import DealerInfoCard from "../components/dealer.info.card";
 import { Searchbar } from "react-native-paper";
 import { DealersContext } from "../../../services/dealers/dealers.context";
 import { FlatList } from "react-native";
+import {
+  Ionicons,
+  MaterialCommunityIcons,
+  FontAwesome5,
+  AntDesign,
+} from "@expo/vector-icons";
+
 
 export default function Dealers({ navigation }) {
   const navigateBack = () => {
@@ -22,6 +29,10 @@ export default function Dealers({ navigation }) {
     navigation.navigate("DealerDetails", (dealer = { dealer }));
   };
 
+  const togleAddDealerOverlay = () => {
+   
+  };
+  
   const { dealers, isLaoding, error, fetchDealers } =
     useContext(DealersContext);
   return (
@@ -42,6 +53,24 @@ export default function Dealers({ navigation }) {
         }}
         keyExtractor={(item) => item.dealerId}
       />
+
+      <TouchableOpacity
+        style={{
+
+
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: 70,
+          position: 'absolute',
+          bottom: 40,
+          right: 10,
+          height: 70,
+          borderRadius: 100,
+        }}
+        onPress={togleAddDealerOverlay}
+      >
+        <AntDesign name="pluscircle" size={64} color="#689F38" />
+      </TouchableOpacity>
     </View>
   );
 }

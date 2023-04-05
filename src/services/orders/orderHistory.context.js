@@ -2,6 +2,7 @@ import React, { useState, createContext,useEffect } from "react";
 import {
   GetOrderHistoryByDealerId,
   AddNewOrderService,
+  GetOrderHistory
 } from "./orderHistory.service";
 import { onSnapshot } from "firebase/firestore";
 export const OrderHistoryContext = createContext();
@@ -44,6 +45,33 @@ export const OrderHistoryContextProvider = ({ children }) => {
         console.log(e);
       });
   };
+
+  const fetchOrderHistory = () => {
+    setIsLoading(true);
+    console.log(
+      "in function fetch fetchOrderHistory in context");
+
+    GetOrderHistory()
+      .then((snapshot) => {
+        const orderHistoryList = [];
+        setOrderHistory(orderHistoryList);
+        snapshot.docs.forEach((doc) => {
+          orderHistoryList.push({ ...doc.data(), id: doc.id });
+        });
+        setOrderHistory(orderHistoryList);
+        console.log("orderHistoryList fron db is ", orderHistoryList);
+        setIsLoading(false);
+        setSucess(true);
+      })
+      .catch((e) => {
+        setSucess(false);
+        setIsLoading(false);
+        setError(e.toString());
+        console.log(e);
+      });
+  };
+
+
   const AddNewOrder = (orderHistory) => {
     setIsLoading(true);
     console.log(
@@ -88,7 +116,8 @@ export const OrderHistoryContextProvider = ({ children }) => {
         AddNewOrder,
         isOrderHistoryCallLoading,
         orderHistoryCallError,
-        orderHistoryCallsucess
+        orderHistoryCallsucess,
+        fetchOrderHistory
       }}
     >
       {children}

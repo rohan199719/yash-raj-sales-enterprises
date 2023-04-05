@@ -121,6 +121,7 @@ export default function AddPaymentFormOverlay({
         paymentAmount: PaidAmount,
         remark: Notes,
         paymentDate: PaymentDate,
+        paymentDateTimestampString:mydate.valueOf(),
         paymentDateTimestamp: Timestamp.fromDate(mydate),
       };
       dealer.dueAmount = remainingDue;

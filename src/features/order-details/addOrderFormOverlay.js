@@ -265,6 +265,7 @@ export default function AddOrderFormOverlay({ toggleOrderOverlay, dealer }) {
         netBillingAmount: netBillingAmmount,
         Notes: Notes,
         orderDate: orderDate,
+        orderDateTimestampString: mydate.valueOf(),
         orderDateTimestamp: Timestamp.fromDate(mydate),
       };
       AddNewOrderCall(newOrder);
@@ -295,6 +296,7 @@ const handleSubmitPrev = () => {
       netBillingAmount: netBillingAmmount,
       Notes: Notes,
       orderDate: orderDate,
+     
       orderDateTimestamp: Timestamp.fromDate(mydate),
     };
     AddNewOrderCall(newOrder);

@@ -335,6 +335,7 @@ export default function DealerDetails({ navigation, route }) {
           />
         )
       )}
+
   {orderListRenderFlag ? (
         <>
           <DividertertiarySmall />
@@ -357,13 +358,14 @@ export default function DealerDetails({ navigation, route }) {
         //   }}
         //   keyExtractor={(item) => item.pmtId}
         // />
-        LoadingIndicatorRenderFlag && (
-          <ActivityIndicator
-            style={{ marginTop: 8 }}
-            size="large"
-            color="#138000"
-          />
-        )
+        // LoadingIndicatorRenderFlag && (
+        //   <ActivityIndicator
+        //     style={{ marginTop: 8 }}
+        //     size="large"
+        //     color="#138000"
+        //   />
+        // )
+        null
       )}
 
 

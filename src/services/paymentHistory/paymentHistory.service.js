@@ -7,6 +7,7 @@ import {
   orderBy,
   addDoc,
   updateDoc,
+  Timestamp,
 } from "firebase/firestore";
 
 export const GetPaymentHistoryByDealerId = (d_id) => {
@@ -22,6 +23,26 @@ export const GetPaymentHistoryByDealerId = (d_id) => {
   console.log("after query formed");
   return getDocs(q);
 };
+
+export const GetPaymentHistory = () => {
+  console.log("in service method GetPaymentHistory");
+  const db = getFirestore();
+ 
+  const colref = collection(db, "paymentHistory");
+
+  var now = new Date();
+  const thirtyDayAgo = new Date().setDate(now.getDate()-30);
+      console.log("line is 43 ");
+  console.log(thirtyDayAgo.valueOf());
+ 
+  const q = query(
+    colref,
+    where("paymentDateTimestampString", ">=",thirtyDayAgo.valueOf()),
+    orderBy("paymentDateTimestampString", "desc")
+  );
+  return getDocs(q);
+};
+
 
 export const AddPaymentHistory = (paymentHistory) => {
   console.log(
