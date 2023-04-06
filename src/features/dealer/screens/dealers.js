@@ -19,9 +19,13 @@ import {
   FontAwesome5,
   AntDesign,
 } from "@expo/vector-icons";
+import AddDealerFormOverlay from "../components/addDealerFormOverlay";
 
 
 export default function Dealers({ navigation }) {
+
+  const [addDealerOverlayOpenFlag, setAddDealerOverlayOpenFlag] = useState(false);
+
   const navigateBack = () => {
     navigation.navigate("Home");
   };
@@ -29,8 +33,8 @@ export default function Dealers({ navigation }) {
     navigation.navigate("DealerDetails", (dealer = { dealer }));
   };
 
-  const togleAddDealerOverlay = () => {
-   
+  const toggleAddDealerOverlay = () => {
+    setAddDealerOverlayOpenFlag(!addDealerOverlayOpenFlag);
   };
   
   const { dealers, isLaoding, error, fetchDealers } =
@@ -67,10 +71,16 @@ export default function Dealers({ navigation }) {
           height: 70,
           borderRadius: 100,
         }}
-        onPress={togleAddDealerOverlay}
+        onPress={toggleAddDealerOverlay}
       >
         <AntDesign name="pluscircle" size={64} color="#689F38" />
       </TouchableOpacity>
+
+      {addDealerOverlayOpenFlag && (
+        <AddDealerFormOverlay
+        toggleAddDealerOverlay={toggleAddDealerOverlay}
+        />
+      )}
     </View>
   );
 }
