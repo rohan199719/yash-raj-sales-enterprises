@@ -11,15 +11,17 @@ import {
 } from "react-native";
 
 export const MainContainer = styled(View)`
-  height: 64px;
+  height: 84px;
   justify-content: flex-start;
   align-items: center;
   background-color: ${(props) => props.theme.colors.ui.tertiary};
   border-radius: 4px;
   border-bottom-width: 1px;
-  border-bottom-color: ${(props) => props.theme.colors.ui.primary};
+  border-top-width: 1px;
+  border-color: ${(props) => props.theme.colors.ui.primary};
   flex: 1;
   flex-direction: row;
+  margin:2px
 `;
 export const BottomContainer = styled(View)`
   flex: 1;
@@ -35,7 +37,7 @@ export const TimeSection = styled(View)`
   justify-content: center;
 `;
 
-export const PaymentDetailSection = styled(View)`
+export const OrderDetailSection = styled(View)`
   padding-top: 2px;
   flex: 3;
   margin-left: 8px;
@@ -46,6 +48,7 @@ export const TopView = styled(View)`
   flex-direction: row;
   justify-content: space-between;
   margin-bottom: 12px;
+  margin-right: 20px;
 `;
 export const MiddleView = styled(View)`
   flex-direction: row;
@@ -56,4 +59,9 @@ export const BottomView = styled(View)`
   flex-direction: row;
   justify-content: space-between;
   margin-right: 20px;
+`;
+export const Divider = styled(View)`
+  height: 16px;
+  width: 100%;
+  background-color: ${(props) => props.theme.colors.ui.quaternary};
 `;

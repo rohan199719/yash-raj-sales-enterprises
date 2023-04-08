@@ -35,7 +35,7 @@ export const TimeSection = styled(View)`
   justify-content: center;
 `;
 
-export const PaymentDetailSection = styled(View)`
+export const OrderDetailSection = styled(View)`
   padding-top: 2px;
   flex: 3;
   margin-left: 8px;
@@ -46,6 +46,7 @@ export const TopView = styled(View)`
   flex-direction: row;
   justify-content: space-between;
   margin-bottom: 12px;
+  margin-right: 20px;
 `;
 export const MiddleView = styled(View)`
   flex-direction: row;

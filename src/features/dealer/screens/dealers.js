@@ -16,7 +16,7 @@ import { FlatList } from "react-native";
 import {
   Ionicons,
   MaterialCommunityIcons,
-  FontAwesome5,
+  FontAwesome,
   AntDesign,
 } from "@expo/vector-icons";
 import AddDealerFormOverlay from "../components/addDealerFormOverlay";
@@ -36,7 +36,7 @@ export default function Dealers({ navigation }) {
   const toggleAddDealerOverlay = () => {
     setAddDealerOverlayOpenFlag(!addDealerOverlayOpenFlag);
   };
-  
+
   const { dealers, isLaoding, error, fetchDealers } =
     useContext(DealersContext);
   return (
@@ -59,26 +59,40 @@ export default function Dealers({ navigation }) {
       />
 
       <TouchableOpacity
-        style={{
+style={{
 
+  // borderWidth: 4,
+  // alignItems: 'center',
+  // justifyContent: 'center',
+  // width: 62,
+  // position: 'absolute',
+  // bottom: 40,
+  // right: 10,
+  // height: 62,
+  // borderRadius: 31,
+  // borderColor: "#388E3C"
+  height: 60,
+  width: 60,
+  position: 'absolute',
+  justifyContent: 'center',
+  alignItems: 'center',
+  borderRadius: 30,
+  backgroundColor: "#4C4B16",
+   bottom: 38,
+  right: 12,
+  elevation: 16,
+  borderWidth: 3,
+  borderColor: "#DCEDC8"
 
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: 70,
-          position: 'absolute',
-          bottom: 40,
-          right: 10,
-          height: 70,
-          borderRadius: 100,
-        }}
+}}
         onPress={toggleAddDealerOverlay}
       >
-        <AntDesign name="pluscircle" size={64} color="#689F38" />
+        <MaterialCommunityIcons name="account-plus" size={30} color="#DCEDC8" />
       </TouchableOpacity>
 
       {addDealerOverlayOpenFlag && (
         <AddDealerFormOverlay
-        toggleAddDealerOverlay={toggleAddDealerOverlay}
+          toggleAddDealerOverlay={toggleAddDealerOverlay}
         />
       )}
     </View>

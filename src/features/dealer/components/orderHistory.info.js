@@ -8,12 +8,12 @@ import { TouchableOpacity, View } from "react-native";
 import { Text } from "../../global/components/typography/text.component";
 import {
   TimeSection,
-  PaymentDetailSection,
+  OrderDetailSection,
   MainContainer,
   BottomContainer,
   BottomView,
   TopView,
-} from "./paymentHistory.info.style";
+} from "./orderHistory.info.style";
 import { ToastAndroid, Platform, AlertIOS } from "react-native";
 export default function OrderHistoryInfo({ orderDetails = {} }) {
   const months = [
@@ -45,6 +45,7 @@ export default function OrderHistoryInfo({ orderDetails = {} }) {
     dealerName = "default",
     orderDateTimestamp = "test123",
     Notes = "test",
+    orderedProducts=[]
   } = orderDetails;
   const renderTaost = () => {
     if (Platform.OS === "android") {
@@ -79,7 +80,7 @@ export default function OrderHistoryInfo({ orderDetails = {} }) {
       <View
         style={{ width: 2, height: "80%", backgroundColor: "#689F38" }}
       ></View>
-      <PaymentDetailSection>
+      <OrderDetailSection>
         <TopView>
           <View
             style={{
@@ -99,7 +100,9 @@ export default function OrderHistoryInfo({ orderDetails = {} }) {
               Billing Amount: {netBillingAmount}
             </Text>
           </View>
-
+          <TouchableOpacity onPress={renderTaost}>
+            <Text variant="labelSmall">View Notes</Text>
+          </TouchableOpacity>
           {/* <Text
             style={{ width: "36%" }}
             variant="error"
@@ -110,9 +113,7 @@ export default function OrderHistoryInfo({ orderDetails = {} }) {
           </Text> */}
         </TopView>
         <BottomView>
-          <TouchableOpacity onPress={renderTaost}>
-            <Text variant="labelSmall">View Notes</Text>
-          </TouchableOpacity>
+        <Text variant="labelSmall">{orderedProducts.length}{" "}items ordered</Text>
           <TouchableOpacity
             style={{ flexDirection: "row" }}
             onPress={renderTaost}
@@ -121,7 +122,7 @@ export default function OrderHistoryInfo({ orderDetails = {} }) {
             <FontAwesome5 name="receipt" size={16} color="#689F38" />
           </TouchableOpacity>
         </BottomView>
-      </PaymentDetailSection>
+      </OrderDetailSection>
     </MainContainer>
   );
 }

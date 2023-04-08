@@ -4,12 +4,21 @@ import {
   doc,
   getDocs,
   updateDoc,
+  addDoc,
 } from "firebase/firestore";
 
 export const GetDealers = () => {
   const db = getFirestore();
   const colref = collection(db, "dealers");
   return getDocs(colref);
+};
+
+export const AddDealers = (newDealer) => {
+  console.log(
+    "in service AddDealers method");
+  const db = getFirestore();
+  const colref = collection(db, "dealers");
+  return addDoc(colref, newDealer);
 };
 
 export const updatedealerInfo = (dealer) => {

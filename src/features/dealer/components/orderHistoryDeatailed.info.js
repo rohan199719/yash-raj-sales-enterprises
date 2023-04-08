@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   Ionicons,
   MaterialCommunityIcons,
@@ -8,13 +8,15 @@ import { TouchableOpacity, View } from "react-native";
 import { Text } from "../../global/components/typography/text.component";
 import {
   TimeSection,
-  PaymentDetailSection,
+  OrderDetailSection,
   MainContainer,
   BottomContainer,
   BottomView,
+  MiddleView,
   TopView,
-} from "./paymentHistory.info.style";
+} from "./orderHistoryDetailed.info.style";
 import { ToastAndroid, Platform, AlertIOS } from "react-native";
+import ItemOrderedOverlay from "./itemsOrderedOverlay";
 export default function OrderHistoryDetailedInfo({ orderDetails = {} }) {
   const months = [
     "JAN",
@@ -46,7 +48,10 @@ export default function OrderHistoryDetailedInfo({ orderDetails = {} }) {
     orderDateTimestamp = "test123",
     orderDateTimestampString="test123",
     Notes = "test",
+    orderedProducts=[]
   } = orderDetails;
+  const [showNotesFlag, setShowNotesFlag] = useState(false);
+  const [showItemsOverLayFlag, setShowItemsOverLayFlag] = useState(false);
   const renderTaost = () => {
     if (Platform.OS === "android") {
       ToastAndroid.show("coming soon", ToastAndroid.SHORT);
@@ -54,6 +59,14 @@ export default function OrderHistoryDetailedInfo({ orderDetails = {} }) {
       AlertIOS.alert("coming soon");
     }
   };
+const toggleNotes =()=>{
+  setShowNotesFlag(!showNotesFlag);
+
+}
+const toggleitemOverLay =()=>{
+  setShowItemsOverLayFlag(!showItemsOverLayFlag);
+
+}
 
   console.log("order history detailed card page loaded");
   return (
@@ -80,9 +93,32 @@ export default function OrderHistoryDetailedInfo({ orderDetails = {} }) {
       <View
         style={{ width: 2, height: "80%", backgroundColor: "#689F38" }}
       ></View>
-      <PaymentDetailSection>
+      <OrderDetailSection>
         <TopView>
-          <View
+        <Text variant="title" adjustsFontSizeToFit numberOfLines={1}>
+            {dealerName.toUpperCase()}
+          </Text>
+          
+          <TouchableOpacity onPress={toggleNotes}>
+          {!showNotesFlag && <Text variant="labelSmall" >View Notes</Text>}
+          {showNotesFlag && <Text variant="labelSmall" >Hide Notes</Text>}
+          </TouchableOpacity>
+          {/* <Text
+            style={{ width: "36%" }}
+            variant="error"
+            adjustsFontSizeToFit
+            numberOfLines={1}
+          >
+            Due amount : {dueAmount}
+          </Text> */}
+        </TopView>
+        <MiddleView>
+        {showNotesFlag && <Text variant="labelSmall" adjustsFontSizeToFit numberOfLines={2}>
+            {Notes.length>0?Notes:"No notes available"}
+          </Text>}
+        </MiddleView>
+        <BottomView>
+        <View
             style={{
               width: "50%",
               justifyContent: "flex-start",
@@ -97,32 +133,27 @@ export default function OrderHistoryDetailedInfo({ orderDetails = {} }) {
             }}
           >
             <Text variant="title" adjustsFontSizeToFit numberOfLines={1}>
-              Billing Amount: {netBillingAmount}
+              {" "}Billing Amount: {netBillingAmount}{" "}
             </Text>
           </View>
-
-          {/* <Text
-            style={{ width: "36%" }}
-            variant="error"
-            adjustsFontSizeToFit
-            numberOfLines={1}
-          >
-            Due amount : {dueAmount}
-          </Text> */}
-        </TopView>
-        <BottomView>
-          <TouchableOpacity onPress={renderTaost}>
-            <Text variant="labelSmall">View Notes</Text>
-          </TouchableOpacity>
           <TouchableOpacity
             style={{ flexDirection: "row" }}
-            onPress={renderTaost}
+            onPress={toggleitemOverLay}
           >
             <Text variant="labelSmall">ordered items{"   "}</Text>
             <FontAwesome5 name="receipt" size={16} color="#689F38" />
           </TouchableOpacity>
         </BottomView>
-      </PaymentDetailSection>
+      </OrderDetailSection>
+
+     {showItemsOverLayFlag && 
+     
+     <ItemOrderedOverlay
+     orderDetails={orderDetails}
+     toggleitemOverLay={toggleitemOverLay}
+        />
+     }
+
     </MainContainer>
   );
 }

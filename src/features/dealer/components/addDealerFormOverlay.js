@@ -116,7 +116,8 @@ export default function AddDealerFormOverlay({ toggleAddDealerOverlay }) {
     isLaodingDealer,
     errorDealer,
     successDealerDb,
-    AddNewDealer
+    AddNewDealer,
+    fetchDealers
   } = useContext(DealersContext);
 
 
@@ -165,21 +166,24 @@ export default function AddDealerFormOverlay({ toggleAddDealerOverlay }) {
   const handleSubmit = () => {
     if (isInputValid()) {
       const newDealer = {
-        dealerId: dealer.dealerId,
+        dealerId: "DL-",
         name: name,
         nickname: nickname,
         mobleNumer: mobileNumer,
         buisnessName: buisnessName,
-        dueAmount: dueAmount,
+        dueAmount: dueAmount!=""?dueAmount:0,
         address: address,
         Notes: Notes,
-        orderDate: orderDate,
-        orderDateTimestampString: mydate.valueOf(),
-        orderDateTimestamp: Timestamp.fromDate(mydate),
-      };
+        entryDate: entryDate,
+        entryDateTimestampString: mydate.valueOf(),
+        entryDateTimestamp: Timestamp.fromDate(mydate),
+        lastPaymentDate:"NA",
+        lastFollow:"NA",    
+        };
+      newDealer.dealerId=newDealer.dealerId + newDealer.entryDateTimestampString
       AddNewDealerCall(newDealer);
       console.log("AddNewDealerCall sucess");
-      renderTaost("order added sucessfully");
+      renderTaost("Dealer added sucessfully");
       toggleAddDealerOverlay();
       fetchDealers();
 

@@ -1,6 +1,6 @@
 import React, { useState, createContext, useEffect } from "react";
 
-import { GetDealers, updatedealerInfo } from "./dealers.service";
+import { GetDealers, updatedealerInfo,AddDealers } from "./dealers.service";
 import { getAuth } from "firebase/auth";
 export const DealersContext = createContext();
 
@@ -25,6 +25,22 @@ export const DealerContextProvider = ({ children }) => {
         console.log(e);
       });
   };
+ const AddNewDealer = (newDealer)=>{
+  setIsLoading(true);
+  console.log("in function Add dealers in context");
+  AddDealers(newDealer)
+    .then(() => {
+      console.log("dealer due amount info updated");
+      setIsLoading(false);
+    })
+    .catch((e) => {
+      setIsLoading(false);
+      setError(e.toString());
+      console.log(e);
+    });
+
+ };
+
   const fetchDealers = () => {
     setIsLoading(true);
     console.log("in function fetch dealers in context");
@@ -55,6 +71,7 @@ export const DealerContextProvider = ({ children }) => {
         isLoading,
         error,
         fetchDealers,
+        AddNewDealer,
         updateDelearDueAmountById,
       }}
     >

@@ -12,8 +12,9 @@ import {
   MainContainer,
   BottomContainer,
   BottomView,
+  MiddleView,
   TopView,
-} from "./paymentHistory.info.style";
+} from "./paymentHistoryDetailed.info.style";
 import { ToastAndroid, Platform, AlertIOS } from "react-native";
 export default function PaymentHistoryDetailedInfo({ paymentDetails = {} }) {
   const months = [
@@ -85,7 +86,35 @@ export default function PaymentHistoryDetailedInfo({ paymentDetails = {} }) {
       ></View>
       <PaymentDetailSection>
         <TopView>
-          <View
+        <Text variant="title" adjustsFontSizeToFit numberOfLines={1}>
+            {dealerName.toUpperCase()}
+          </Text>
+          
+          <TouchableOpacity onPress={renderTaost}>
+            <Text variant="labelSmall" >View Notes</Text>
+          </TouchableOpacity>
+          {/* <Text
+            style={{ width: "36%" }}
+            variant="error"
+            adjustsFontSizeToFit
+            numberOfLines={1}
+          >
+            Due amount : {dueAmount}
+          </Text> */}
+        </TopView>
+        <MiddleView>
+          
+          {/* <Text
+            style={{ width: "36%" }}
+            variant="error"
+            adjustsFontSizeToFit
+            numberOfLines={1}
+          >
+            Due amount : {dueAmount}
+          </Text> */}
+        </MiddleView>
+        <BottomView>
+        <View
             style={{
               width: "50%",
               justifyContent: "flex-start",
@@ -100,23 +129,9 @@ export default function PaymentHistoryDetailedInfo({ paymentDetails = {} }) {
             }}
           >
             <Text variant="title" adjustsFontSizeToFit numberOfLines={1}>
-              Amount Paid : {paymentAmount}
+              {" "}Amount Paid : {paymentAmount}{" "}
             </Text>
           </View>
-
-          <Text
-            style={{ width: "36%" }}
-            variant="error"
-            adjustsFontSizeToFit
-            numberOfLines={1}
-          >
-            Due amount : {dueAmount}
-          </Text>
-        </TopView>
-        <BottomView>
-          <TouchableOpacity onPress={renderTaost}>
-            <Text variant="labelSmall">View comments</Text>
-          </TouchableOpacity>
           <TouchableOpacity
             style={{ flexDirection: "row" }}
             onPress={renderTaost}
@@ -124,6 +139,7 @@ export default function PaymentHistoryDetailedInfo({ paymentDetails = {} }) {
             <Text variant="labelSmall">Receipt{"   "}</Text>
             <FontAwesome5 name="receipt" size={16} color="#689F38" />
           </TouchableOpacity>
+          
         </BottomView>
       </PaymentDetailSection>
     </MainContainer>
