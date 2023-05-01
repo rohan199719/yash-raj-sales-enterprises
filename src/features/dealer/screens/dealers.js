@@ -7,6 +7,7 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
+  ActivityIndicator
 } from "react-native";
 import DealerList from "../components/dealers.style";
 import DealerInfoCard from "../components/dealer.info.card";
@@ -25,6 +26,8 @@ import AddDealerFormOverlay from "../components/addDealerFormOverlay";
 export default function Dealers({ navigation }) {
 
   const [addDealerOverlayOpenFlag, setAddDealerOverlayOpenFlag] = useState(false);
+  const [searchQuery, setSearchQuery] =useState('');
+  const [filteredDealer, setFilteredDealer] =useState(dealers);
 
   const navigateBack = () => {
     navigation.navigate("Home");
@@ -36,15 +39,32 @@ export default function Dealers({ navigation }) {
   const toggleAddDealerOverlay = () => {
     setAddDealerOverlayOpenFlag(!addDealerOverlayOpenFlag);
   };
-
-  const { dealers, isLaoding, error, fetchDealers } =
+  useEffect(() => {
+    console.log("deleare relaoded");
+    fetchDealers();
+    console.log("fetch dealer called");
+    setFilteredDealer(dealers);
+    console.log("filtered dealer set to default dealers");
+   
+  }, []);
+  const onChangeSearch = (query) => {
+    setSearchQuery(query);
+    var filterDealer = dealers.filter(dealer => dealer.name.toLowerCase().includes(query.toLowerCase()));
+    
+    setFilteredDealer(filterDealer);
+  }
+  const { dealers, isLoading, error, fetchDealers } =
     useContext(DealersContext);
-  return (
+  return (isLoading? <ActivityIndicator size="large" color="#689F38" style={{position:"absolute",right:'50%',left:'50%',top:'50%',bottom:'50%'}}/> :
     <View>
+      <Searchbar  placeholder="Search Dealers"
+      placeholderTextColor={"#757575"}
+      onChangeText={onChangeSearch}
+      style={{backgroundColor:"#DCEDC8",margin:5}}
+      value={searchQuery}></Searchbar>
       <FlatList
-        data={dealers}
+        data={filteredDealer==null?dealers:filteredDealer}
         renderItem={({ item }) => {
-          console.log("in render item", item);
           return (
             <TouchableOpacity
               onPress={() => {
@@ -58,7 +78,8 @@ export default function Dealers({ navigation }) {
         keyExtractor={(item) => item.dealerId}
       />
 
-      <TouchableOpacity
+
+<TouchableOpacity
 style={{
 
   // borderWidth: 4,
@@ -78,7 +99,7 @@ style={{
   alignItems: 'center',
   borderRadius: 30,
   backgroundColor: "#4C4B16",
-   bottom: 38,
+   bottom: 72,
   right: 12,
   elevation: 16,
   borderWidth: 3,
@@ -89,6 +110,8 @@ style={{
       >
         <MaterialCommunityIcons name="account-plus" size={30} color="#DCEDC8" />
       </TouchableOpacity>
+
+    
 
       {addDealerOverlayOpenFlag && (
         <AddDealerFormOverlay

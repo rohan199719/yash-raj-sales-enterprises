@@ -110,7 +110,7 @@ export default function AddPaymentFormOverlay({
     }
     return true;
   };
-  const handleSubmit = () => {
+  const  handleSubmit = async () => {
     if (isInputValid()) {
       const remainingDue = Number(dealer.dueAmount) - Number(PaidAmount);
       console.log("remaining diue amount is ", remainingDue);
@@ -125,7 +125,8 @@ export default function AddPaymentFormOverlay({
         paymentDateTimestamp: Timestamp.fromDate(mydate),
       };
       dealer.dueAmount = remainingDue;
-      submitNewPayment(newPaymentHistory);
+      await submitNewPayment(newPaymentHistory);
+      fetchPaymentHistoryByDealerId(dealer.dealerId);
     } else {
       console.log("error flag is " + inputValidationError);
       return;
@@ -152,6 +153,7 @@ export default function AddPaymentFormOverlay({
     }
   };
   const changeSelectedDate = (event, selectedDate) => {
+    setDisplayDatePicker(false);
     const currentDate = selectedDate || mydate;
     setDate(currentDate);
     const dateString =
@@ -163,7 +165,7 @@ export default function AddPaymentFormOverlay({
     setPaymentDate(dateString);
     console.log("selectd Date is", selectedDate);
     console.log("payment Date is", dateString);
-    setDisplayDatePicker(false);
+    
   };
 
   const openDatePicker = () => {

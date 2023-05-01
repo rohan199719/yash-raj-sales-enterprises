@@ -15,25 +15,25 @@ import { Searchbar } from "react-native-paper";
 import { DealersContext } from "../../../services/dealers/dealers.context";
 import { PaymentHistoryContext } from "../../../services/paymentHistory/paymentHistory.context";
 import { OrderHistoryContext } from "../../../services/orders/orderHistory.context";
-export default function Home({ navigation }) {
+export default function Root({ navigation }) {
   const { dealers, isLoading, error, fetchDealers } =
     useContext(DealersContext);
-    const { paymentHistory, isLaoding, fetchPaymentHistory } =
+    const {fetchPaymentHistory } =
     useContext(PaymentHistoryContext);
     const {fetchOrderHistory} =
     useContext(OrderHistoryContext);
   const navigateToDealerPage = () => {
-    fetchDealers();
+    //fetchDealers();
     navigation.navigate("Dealers");
   };
 
   const navigateToPaymentHistoryPage = () => {
-    fetchPaymentHistory();
+    //fetchPaymentHistory();
     navigation.navigate("Payments");
   };
 
   const navigateToOrderHistoryPage = () => {
-    fetchOrderHistory();
+    //fetchOrderHistory();
     navigation.navigate("Orders");
   };
   
@@ -70,17 +70,13 @@ export default function Home({ navigation }) {
           <View style={styles.bottomButtonContainer}>
             <TouchableOpacity
               style={styles.bottomButton}
-              Text={isLoading ? "Loading..." : "Dealers"}
+              Text="Dealers"
               onPress={navigateToDealerPage}
             >
-              {!isLoading ? (
                 <Image
                   source={require("../../../../assets/dealersIcon-removebg-preview.png")}
                   style={styles.imageDealers}
                 />
-              ) : (
-                <ActivityIndicator size="large" color="yellow" />
-              )}
             </TouchableOpacity>
           </View>
         </View>

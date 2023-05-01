@@ -198,6 +198,7 @@ export default function AddDealerFormOverlay({ toggleAddDealerOverlay }) {
   };
 
   const changeSelectedDate = (event, selectedDate) => {
+    setDisplayDatePicker(false);
     const currentDate = selectedDate || mydate;
     const dateString =
       currentDate.getDate() +
@@ -208,7 +209,7 @@ export default function AddDealerFormOverlay({ toggleAddDealerOverlay }) {
     setEntryDate(dateString);
     console.log("selectd Date is", selectedDate);
     console.log("order Date is", dateString);
-    setDisplayDatePicker(false);
+    
   };
 
   return (

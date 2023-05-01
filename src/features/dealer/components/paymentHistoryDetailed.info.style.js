@@ -52,7 +52,7 @@ export const TopView = styled(View)`
 `;
 export const MiddleView = styled(View)`
   flex-direction: row;
-  justify-content: space-evenly;
+  justify-content: space-between;
   margin-bottom: 12px;
 `;
 export const BottomView = styled(View)`

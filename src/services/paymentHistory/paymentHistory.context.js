@@ -10,6 +10,7 @@ export const PaymentHistoryContext = createContext();
 export const PaymentHistoryContextProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [paymentHistory, setPaymentHistory] = useState(null);
+  const [paymentHistoryDealerSpecific, setPaymentHistoryDealerSpecific] = useState(null);
   const [error, setError] = useState(null);
   const [sucess, setSucess] = useState(false);
 
@@ -23,11 +24,11 @@ export const PaymentHistoryContextProvider = ({ children }) => {
     GetPaymentHistoryByDealerId(dealerId)
       .then((snapshot) => {
         const paymentHistoryList = [];
-        setPaymentHistory(paymentHistoryList);
+        setPaymentHistoryDealerSpecific(paymentHistoryList);
         snapshot.docs.forEach((doc) => {
           paymentHistoryList.push({ ...doc.data(), id: doc.id });
         });
-        setPaymentHistory(paymentHistoryList);
+        setPaymentHistoryDealerSpecific(paymentHistoryList);
         setIsLoading(false);
         setSucess(true);
       })
@@ -85,6 +86,7 @@ export const PaymentHistoryContextProvider = ({ children }) => {
     <PaymentHistoryContext.Provider
       value={{
         paymentHistory,
+        paymentHistoryDealerSpecific,
         isLoading,
         error,
         sucess,

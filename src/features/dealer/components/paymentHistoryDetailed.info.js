@@ -1,4 +1,4 @@
-import React from "react";
+import React,{ useState } from "react";
 import {
   Ionicons,
   MaterialCommunityIcons,
@@ -17,6 +17,8 @@ import {
 } from "./paymentHistoryDetailed.info.style";
 import { ToastAndroid, Platform, AlertIOS } from "react-native";
 export default function PaymentHistoryDetailedInfo({ paymentDetails = {} }) {
+  const [showNotesFlag, setShowNotesFlag] = useState(false);
+
   const months = [
     "JAN",
     "FEB",
@@ -51,6 +53,7 @@ export default function PaymentHistoryDetailedInfo({ paymentDetails = {} }) {
     paymentDateTimestampString="test123",
     remark = "test",
   } = paymentDetails;
+
   const renderTaost = () => {
     if (Platform.OS === "android") {
       ToastAndroid.show("coming soon", ToastAndroid.SHORT);
@@ -58,6 +61,11 @@ export default function PaymentHistoryDetailedInfo({ paymentDetails = {} }) {
       AlertIOS.alert("coming soon");
     }
   };
+
+  const toggleNotes =()=>{
+    setShowNotesFlag(!showNotesFlag);
+  
+  }
 
   console.log("history card page loaded");
   return (
@@ -90,8 +98,9 @@ export default function PaymentHistoryDetailedInfo({ paymentDetails = {} }) {
             {dealerName.toUpperCase()}
           </Text>
           
-          <TouchableOpacity onPress={renderTaost}>
-            <Text variant="labelSmall" >View Notes</Text>
+          <TouchableOpacity onPress={toggleNotes}>
+          {!showNotesFlag && <Text variant="labelSmall" >View Notes</Text>}
+          {showNotesFlag && <Text variant="labelSmall" >Hide Notes</Text>}
           </TouchableOpacity>
           {/* <Text
             style={{ width: "36%" }}
@@ -103,15 +112,9 @@ export default function PaymentHistoryDetailedInfo({ paymentDetails = {} }) {
           </Text> */}
         </TopView>
         <MiddleView>
-          
-          {/* <Text
-            style={{ width: "36%" }}
-            variant="error"
-            adjustsFontSizeToFit
-            numberOfLines={1}
-          >
-            Due amount : {dueAmount}
-          </Text> */}
+        {showNotesFlag && <Text variant="labelSmall" adjustsFontSizeToFit numberOfLines={2}>
+            {remark.length>0?remark:"No notes available"}
+          </Text>}
         </MiddleView>
         <BottomView>
         <View

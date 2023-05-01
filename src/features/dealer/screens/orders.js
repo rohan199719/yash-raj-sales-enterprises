@@ -7,6 +7,7 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
+  ActivityIndicator
 } from "react-native";
 import DealerList from "../components/dealers.style";
 import DealerInfoCard from "../components/dealer.info.card";
@@ -20,24 +21,34 @@ export default function Orders({ navigation }) {
   const navigateBack = () => {
     navigation.navigate("Home");
   };
-
+  useEffect(() => {
+    fetchOrderHistory();
+    console.log(
+      "order relaoded"
+    );
+  }, []);
 
   const {orderHistory,
+         fetchOrderHistory,
          isLoading,
           error,
          } = useContext(OrderHistoryContext);
-  return (
-    <View>
-      <FlatList
-        data={orderHistory}
-        renderItem={({ item }) => {
-          console.log("in render item", item);
-          return (
-               <OrderHistoryDetailedInfo orderDetails={item} />
-          );
-        }}
-        keyExtractor={(item) => item.dealerId}
-      />
-    </View>
+  return (isLoading? <ActivityIndicator size="large" color="#689F38" style={{position:"absolute",right:'50%',left:'50%',top:'50%',bottom:'50%'}}/> :<View>
+           {orderHistory && <ScrollView>
+            {orderHistory.map((item) => {
+              return <OrderHistoryDetailedInfo orderDetails={item} key={item.orderDateTimestampString} />;
+            })}
+          </ScrollView>}
+   
+    {/* <FlatList
+      data={orderHistory}
+      renderItem={({ item }) => {
+        return (
+             <OrderHistoryDetailedInfo orderDetails={item} />
+        );
+      }}
+      keyExtractor={(item) => item.orderDateTimestampString}
+    /> */}
+  </View>
   );
 }

@@ -16,12 +16,27 @@ import {
   SubmitButtonText,
   ErrorContainer,
 } from "./login.style";
+import { Overlay } from "react-native-elements";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useEffect } from "react";
 export default function Login({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [ActivityIndicatorEnable, setActivityIndicatorEnable] = useState(false);
 
   const { onLogin, isLoading, error } = useContext(AuthenticationContext);
+
+  const handleLogin = async (email, password) => {
+    setActivityIndicatorEnable(true);
+    await onLogin(email, password);
+    setActivityIndicatorEnable(false);
+  };
+  useEffect(() => {
+
+    console.log(
+      "welcome page  relaoded"
+    );
+  }, [isLoading]);
   return (
     <LoginScreenContainer>
       <BackgroundImage>
@@ -51,20 +66,18 @@ export default function Login({ navigation }) {
                 </ErrorContainer>
               )}
               <SubmitButtonContainer>
-                {isLoading ? (
-                  <SubmitButton disabled="true">
-                    <ActivityIndicator size="small" color="#FFFFFF" />
-                  </SubmitButton>
-                ) : (
-                  <SubmitButton onPress={() => onLogin(email, password)}>
-                    <SubmitButtonText>Submit</SubmitButtonText>
-                  </SubmitButton>
-                )}
+                {
+                  !ActivityIndicatorEnable && (
+                    <SubmitButton onPress={() => handleLogin(email, password)}>
+                      {!isLoading ? <SubmitButtonText>Submit</SubmitButtonText> : <SubmitButtonText>Loading..</SubmitButtonText>}
+                    </SubmitButton>
+                  )}
               </SubmitButtonContainer>
             </LoginFormContainer>
           </ScrollView>
         </BackgroundScreenOpacityLayer>
       </BackgroundImage>
     </LoginScreenContainer>
+
   );
 }

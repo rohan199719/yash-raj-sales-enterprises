@@ -50,7 +50,7 @@ export default function DealerDetails({ navigation, route }) {
     navigation.pop();
   };
   const {
-    orderHistory,
+    orderHistoryDealerSpecific,
     isOrderHistoryCallLoading,
     orderHistoryCallError,
     orderHistoryCallsucess,
@@ -62,10 +62,25 @@ export default function DealerDetails({ navigation, route }) {
    // renderTaost();
     console.log("isOrderHistoryCallLoading is :", isOrderHistoryCallLoading);
     console.log("orderListRender flag  is :", orderListRenderFlag);
-    fetchOrderHistoryByDealerId(id);
+   
+    if(orderHistoryDealerSpecific!=null && orderHistoryDealerSpecific.length>0 && orderHistoryDealerSpecific[0].dealerId==id){
+      console.log("order history already fetched ,skipping db call ");
+      console.log("Already fetched order history is",orderHistoryDealerSpecific);
+    }else{
+      console.log("fetching order hitory from db");
+      fetchOrderHistoryByDealerId(id);
+    }
+    
     console.log("orderListRender flag  is :", orderListRenderFlag);
     console.log("isOrderHistoryCallLoading is :", isOrderHistoryCallLoading);
    
+  };
+  const renderCustomTaost = (message) => {
+    if (Platform.OS === "android") {
+      ToastAndroid.show(message, ToastAndroid.SHORT);
+    } else {
+      AlertIOS.alert(message);
+    }
   };
   const renderTaost = () => {
     if (Platform.OS === "android") {
@@ -75,7 +90,7 @@ export default function DealerDetails({ navigation, route }) {
     }
   };
   const {
-    paymentHistory,
+    paymentHistoryDealerSpecific,
     isLoading,
     error,
     sucess,
@@ -95,20 +110,22 @@ export default function DealerDetails({ navigation, route }) {
   const [AddPaymentOverlayOpened, setAddPaymentOverlayOpened] = useState(false);
   const [AddOrderOverlayOpened, setAddOrderOverlayOpened] = useState(false);
   useEffect(() => {
-    console.log(
-      "deleare details re-rendered, paymentList flag is :" +
-      paymentListRenderFlag +
-      "Button selected is :" +
-      ButttonSelected
-    );
-    console.log("orderListRender flag  is :", orderListRenderFlag);
+  
+    fetchPaymentHistoryByDealerId(dealer.dealerId);
+    console.log("dealer detail loaded, fetch payment called");
   }, []);
   const fetchPaymentHistory = (id) => {
     setPaymentHistoryClicked(true);
     setButttonSelected("paymentHistory");
       console.log("isloading is :", isLoading);
       console.log("paymentListRender flag  is :", paymentListRenderFlag);
-      fetchPaymentHistoryByDealerId(id);
+      if(paymentHistoryDealerSpecific!=null && paymentHistoryDealerSpecific.length>0 && paymentHistoryDealerSpecific[0].dealerId==id){
+        console.log("payment history already fetched ,skipping db call ");
+        console.log("Already fetched payment history is",paymentHistoryDealerSpecific);
+      }else{
+        console.log("fetching order history from db");
+        fetchPaymentHistoryByDealerId(id);
+      }
       console.log("paymentListRender flag  is :", paymentListRenderFlag);
       console.log("isloading is :", isLoading);
     
@@ -120,14 +137,19 @@ export default function DealerDetails({ navigation, route }) {
     AddNewPaymentHistory(paymentHistory);
     console.log("payment add sucess");
     togglePaymentOverlay();
-    fetchPaymentHistoryByDealerId(dealer.dealerId);
+    renderCustomTaost("payment added sucessfully");
     console.log("payment history after additing payment is", paymentHistory);
-    if (paymentHistory != null && paymentHistory.length > 0) {
-      console.log("inside if block");
-      dealer.lastPaymentDate = paymentHistory[0].paymentDate;
-      console.log("last payment date is ", dealer.lastPaymentDate);
+    if (paymentHistoryDealerSpecific != null && paymentHistoryDealerSpecific.length > 0) {
+      console.log("finalizing last payment date");
+      if(paymentHistoryDealerSpecific[0].paymentDateTimestamp>paymentHistory.paymentDateTimestamp){
+        dealer.lastPaymentDate = paymentHistoryDealerSpecific[0].paymentDate;
+      }else{
+        dealer.lastPaymentDate = paymentHistory.paymentDate;
+      }
+    }else{
+      dealer.lastPaymentDate = paymentHistory.paymentDate;
     }
-    dealer.lastPaymentDate = paymentHistory.paymentDate;
+    console.log("last payment date is ", dealer.lastPaymentDate);
     updateDelearDueAmountById(dealer);
     console.log("dealer info uploaded after payment add");
     console.log("is loading is " + isLoading);
@@ -310,8 +332,8 @@ export default function DealerDetails({ navigation, route }) {
           <DividertertiarySmall />
 
           <ScrollView>
-            {paymentHistory.map((item) => {
-              return <PaymentHistoryInfo paymentDetails={item} />;
+            {paymentHistoryDealerSpecific.map((item) => {
+              return <PaymentHistoryInfo paymentDetails={item} key={item.paymentDateTimestampString}/>;
             })}
           </ScrollView>
         </>
@@ -341,8 +363,8 @@ export default function DealerDetails({ navigation, route }) {
           <DividertertiarySmall />
 
           <ScrollView>
-            {orderHistory.map((item) => {
-              return <OrderHistoryInfo orderDetails={item} />;
+            {orderHistoryDealerSpecific.map((item) => {
+              return <OrderHistoryInfo orderDetails={item} key={item.orderDateTimestampString} />;
             })}
           </ScrollView>
         </>

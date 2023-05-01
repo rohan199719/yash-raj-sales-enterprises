@@ -10,6 +10,7 @@ export const OrderHistoryContext = createContext();
 export const OrderHistoryContextProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [orderHistory, setOrderHistory] = useState(null);
+  const [orderHistoryDealerSpecific, setOrderHistoryDealerSpecific] = useState(null);
   const [error, setError] = useState(null);
   const [sucess, setSucess] = useState(false);
   const [isOrderHistoryCallLoading, setIsOrderHistoryCallLoading] = useState(false);
@@ -29,11 +30,11 @@ export const OrderHistoryContextProvider = ({ children }) => {
     GetOrderHistoryByDealerId(dealerId)
       .then((snapshot) => {
         const orderHistoryList = [];
-        setOrderHistory(orderHistoryList);
+        setOrderHistoryDealerSpecific(orderHistoryList);
         snapshot.docs.forEach((doc) => {
           orderHistoryList.push({ ...doc.data(), id: doc.id });
         });
-        setOrderHistory(orderHistoryList);
+        setOrderHistoryDealerSpecific(orderHistoryList);
         console.log("orderHistoryList fron db is ", orderHistoryList);
         setIsOrderHistoryCallLoading(false);
         setOrderHistoryCallsucess(true);
@@ -108,6 +109,7 @@ export const OrderHistoryContextProvider = ({ children }) => {
     <OrderHistoryContext.Provider
       value={{
         orderHistory,
+        orderHistoryDealerSpecific,
         isLoading,
         addNewOrderApiCallInprogress,
         error,

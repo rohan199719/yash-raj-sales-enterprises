@@ -6,7 +6,7 @@ import Dealers from "../../features/dealer/screens/dealers";
 import Payments from "../../features/dealer/screens/payments";
 import Orders from "../../features/dealer/screens/orders";
 import DealerDetails from "../../features/dealer/screens/dealerDetails";
-import Home from "../../features/home/screens/home";
+import Root from "../../features/home/screens/root";
 const Stack = createStackNavigator();
 
 const DealerScreen = () => {
@@ -27,8 +27,8 @@ const DealerDetailsScreen = () => {
 export const HomeNavigator = () => (
   <Stack.Navigator>
     <Stack.Screen
-      name="Home"
-      component={Home}
+      name="Root"
+      component={Root}
       options={{
         title: "YASH RAJ SALES ENTERPRISES",
         headerStyle: {

@@ -336,6 +336,7 @@ const calculateNetPrice = (quantity, pricePerUnit) => {
   };
 };
 const changeSelectedDate = (event, selectedDate) => {
+  setDisplayDatePicker(false);
   const currentDate = selectedDate || mydate;
   setDate(currentDate);
   const dateString =
@@ -347,7 +348,7 @@ const changeSelectedDate = (event, selectedDate) => {
   setOrderDate(dateString);
   console.log("selectd Date is", selectedDate);
   console.log("order Date is", dateString);
-  setDisplayDatePicker(false);
+  
 };
 
 const openDatePicker = () => {

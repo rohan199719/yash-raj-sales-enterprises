@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   Ionicons,
   MaterialCommunityIcons,
@@ -15,7 +15,12 @@ import {
   TopView,
 } from "./orderHistory.info.style";
 import { ToastAndroid, Platform, AlertIOS } from "react-native";
+import ItemOrderedOverlay from "./itemsOrderedOverlay";
 export default function OrderHistoryInfo({ orderDetails = {} }) {
+
+  const [showNotesFlag, setShowNotesFlag] = useState(false);
+  const [showItemsOverLayFlag, setShowItemsOverLayFlag] = useState(false);
+
   const months = [
     "JAN",
     "FEB",
@@ -55,7 +60,15 @@ export default function OrderHistoryInfo({ orderDetails = {} }) {
     }
   };
 
-  console.log("order history card page loaded");
+  const toggleNotes =()=>{
+    setShowNotesFlag(!showNotesFlag);
+  
+  }
+  const toggleitemOverLay =()=>{
+    setShowItemsOverLayFlag(!showItemsOverLayFlag);
+  
+  }
+
   return (
     <MainContainer>
       <TimeSection>
@@ -100,8 +113,9 @@ export default function OrderHistoryInfo({ orderDetails = {} }) {
               Billing Amount: {netBillingAmount}
             </Text>
           </View>
-          <TouchableOpacity onPress={renderTaost}>
-            <Text variant="labelSmall">View Notes</Text>
+          <TouchableOpacity onPress={toggleNotes}>
+          {!showNotesFlag && <Text variant="labelSmall" >View Notes</Text>}
+          {showNotesFlag && <Text variant="labelSmall" >Hide Notes</Text>}
           </TouchableOpacity>
           {/* <Text
             style={{ width: "36%" }}
@@ -113,16 +127,27 @@ export default function OrderHistoryInfo({ orderDetails = {} }) {
           </Text> */}
         </TopView>
         <BottomView>
-        <Text variant="labelSmall">{orderedProducts.length}{" "}items ordered</Text>
-          <TouchableOpacity
+        
+        <TouchableOpacity
             style={{ flexDirection: "row" }}
-            onPress={renderTaost}
+            onPress={toggleitemOverLay}
           >
             <Text variant="labelSmall">ordered items{"   "}</Text>
             <FontAwesome5 name="receipt" size={16} color="#689F38" />
           </TouchableOpacity>
+          {showNotesFlag && <Text variant="labelSmall" adjustsFontSizeToFit numberOfLines={2}>
+            {Notes.length>0?Notes:"No notes available"}
+          </Text>}
+          {/* <Text variant="labelSmall">{orderedProducts.length}{" "}items ordered</Text> */}
         </BottomView>
       </OrderDetailSection>
+      {showItemsOverLayFlag && 
+     
+     <ItemOrderedOverlay
+     orderDetails={orderDetails}
+     toggleitemOverLay={toggleitemOverLay}
+        />
+     }
     </MainContainer>
   );
 }

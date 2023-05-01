@@ -29,14 +29,23 @@ export const AuthenticationContextProvider = ({ children }) => {
       })
       .catch((e) => {
         setIsLoading(false);
-        setError(e.toString());
+        console.log("error is: ",e.message);
+        const errorArray = e.message.replaceAll(").",".").split("auth/");
+        if(errorArray.length>0){
+          setError(errorArray[1]);
+        }else{
+          setError(e.message);
+        }
+        
       });
   };
 
   const onLogout = () => {
+    setIsLoading(true);
     signOut(auth).then(() => {
       setUser(null);
       setError(null);
+      setIsLoading(false);
     });
   };
 

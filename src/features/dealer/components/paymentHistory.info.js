@@ -1,4 +1,4 @@
-import React from "react";
+import React,{ useState } from "react";
 import {
   Ionicons,
   MaterialCommunityIcons,
@@ -16,6 +16,7 @@ import {
 } from "./paymentHistory.info.style";
 import { ToastAndroid, Platform, AlertIOS } from "react-native";
 export default function PaymentHistoryInfo({ paymentDetails = {} }) {
+  const [showNotesFlag, setShowNotesFlag] = useState(false);
   const months = [
     "JAN",
     "FEB",
@@ -57,7 +58,11 @@ export default function PaymentHistoryInfo({ paymentDetails = {} }) {
     }
   };
 
-  console.log("history card page loaded");
+  const toggleNotes =()=>{
+    setShowNotesFlag(!showNotesFlag);
+  
+  }
+
   return (
     <MainContainer>
       <TimeSection>
@@ -102,20 +107,21 @@ export default function PaymentHistoryInfo({ paymentDetails = {} }) {
               Amount Paid : {paymentAmount}
             </Text>
           </View>
-
-          <Text
+          <TouchableOpacity onPress={toggleNotes}>
+          {!showNotesFlag && <Text variant="labelSmall" >View Notes</Text>}
+          {showNotesFlag && <Text variant="labelSmall" >Hide Notes</Text>}
+          </TouchableOpacity>
+          {/* <Text
             style={{ width: "36%" }}
             variant="error"
             adjustsFontSizeToFit
             numberOfLines={1}
           >
             Due amount : {dueAmount}
-          </Text>
+          </Text> */}
         </TopView>
         <BottomView>
-          <TouchableOpacity onPress={renderTaost}>
-            <Text variant="labelSmall">View comments</Text>
-          </TouchableOpacity>
+       
           <TouchableOpacity
             style={{ flexDirection: "row" }}
             onPress={renderTaost}
@@ -123,6 +129,9 @@ export default function PaymentHistoryInfo({ paymentDetails = {} }) {
             <Text variant="labelSmall">Receipt{"   "}</Text>
             <FontAwesome5 name="receipt" size={16} color="#689F38" />
           </TouchableOpacity>
+          {showNotesFlag && <Text variant="labelSmall" adjustsFontSizeToFit numberOfLines={2}>
+            {remark.length>0?remark:"No notes available"}
+          </Text>}
         </BottomView>
       </PaymentDetailSection>
     </MainContainer>

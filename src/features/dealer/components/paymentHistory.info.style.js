@@ -46,6 +46,7 @@ export const TopView = styled(View)`
   flex-direction: row;
   justify-content: space-between;
   margin-bottom: 12px;
+  margin-right:6px;
 `;
 export const MiddleView = styled(View)`
   flex-direction: row;
