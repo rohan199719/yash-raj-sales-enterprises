@@ -26,6 +26,7 @@ import {
 } from "@expo/vector-icons";
 import { TextInput } from "react-native-paper";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { PaymentHistoryContext } from "../../../services/paymentHistory/paymentHistory.context";
 const MainView = styled(View)`
   height: 380px;
   width: 220px;
@@ -96,8 +97,10 @@ const ErrorMessageView = styled(View)`
   align-items: center;
   justify-content: flex-end;
 `;
-export default function ExportPaymenttOverlay({ toggleExportPaymentOverlay,preparePdf }) {
-  
+export default function ExportPaymenttOverlay({
+  toggleExportPaymentOverlay,
+  preparePdf,
+}) {
   const [fromDateEntry, setFromDateEntry] = useState("");
   const [toDateEntry, setToDateEntry] = useState("");
   const [toDateTimeStampString, setToDateTimeStampString] = useState("");
@@ -111,39 +114,51 @@ export default function ExportPaymenttOverlay({ toggleExportPaymentOverlay,prepa
   const [inputValidationError, setInputValidationError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const { paymentHistory, error, fetchPaymentHistory } = useContext(
+    PaymentHistoryContext
+  );
 
   useEffect(() => {
     console.log("export payment overlay relaoded");
-    
+
     const today = new Date();
-    console.log('Before: ', today);
-    setToDateEntry(today.getDate() +
-    "/" +
-    parseInt(today.getMonth() + 1) +
-    "/" +
-    today.getFullYear())
+    console.log("Before: ", today);
+    setToDateEntry(
+      today.getDate() +
+        "/" +
+        parseInt(today.getMonth() + 1) +
+        "/" +
+        today.getFullYear()
+    );
     setToDateTimeStampString(today.valueOf());
     const month = today.getMonth();
     today.setMonth(month - 1);
-    console.log('after: ',today);
-    setFromDateEntry(today.getDate() +
-    "/" +
-    parseInt(today.getMonth() + 1) +
-    "/" +
-    today.getFullYear());
-     //const oneMonthBack = today.setMonth(month - 1);
+    console.log("after: ", today);
+    setFromDateEntry(
+      today.getDate() +
+        "/" +
+        parseInt(today.getMonth() + 1) +
+        "/" +
+        today.getFullYear()
+    );
+    //const oneMonthBack = today.setMonth(month - 1);
     // today.setDate(1);
     setFromDateTimeStampString(today.valueOf());
-    
-
+    setFromDate(today);
   }, []);
 
-
   const isInputValid = () => {
-    console.log("to date is "+toDateTimeStampString+" fromDateTimeStampString is"+fromDateTimeStampString);
+    console.log(
+      "to date is " +
+        toDateTimeStampString +
+        " fromDateTimeStampString is" +
+        fromDateTimeStampString
+    );
     if (toDateTimeStampString < fromDateTimeStampString) {
       console.log("to date must be gratede than from date");
-      setInputValidationError("To date must be gratede than or equal to from date");
+      setInputValidationError(
+        "To date must be gratede than or equal to from date"
+      );
       renderTaost("To date must be gratede than or equal to from date");
       return false;
     }
@@ -153,7 +168,9 @@ export default function ExportPaymenttOverlay({ toggleExportPaymentOverlay,prepa
       renderTaost("AuthPIN is mandatory");
       return false;
     }
-    ()=>{setInputValidationError("")};
+    () => {
+      setInputValidationError("");
+    };
     return true;
   };
 
@@ -174,7 +191,7 @@ export default function ExportPaymenttOverlay({ toggleExportPaymentOverlay,prepa
 
   const handleSubmit = async () => {
     setIsLoading(true);
-    
+
     if (isInputValid()) {
       await generatePdf();
       setIsLoading(false);
@@ -185,16 +202,54 @@ export default function ExportPaymenttOverlay({ toggleExportPaymentOverlay,prepa
     }
   };
 
-  const generatePdf= async ()=>{
+  const generatePdf = async () => {
     console.log("generating PDF");
-   if(fromDate.getDate() >new Date().getDate()){
-    renderTaost("comming soon");
-   }else{
-    await preparePdf();
-   }
-   console.log("PDF generated");
-  }
-
+    var filteredPaymentHistory = paymentHistory;
+    toDate.setHours(0, 0, 0, 0);
+    fromDate.setHours(0, 0, 0, 0);
+    const oneMonthBackDate = new Date();
+    oneMonthBackDate.setMonth(oneMonthBackDate.getMonth() - 1);
+    oneMonthBackDate.setHours(0, 0, 0, 0);
+    if (fromDate.valueOf() < oneMonthBackDate.valueOf()) {
+      console.log("fetch required");
+      renderTaost("comming soon");
+    } else {
+      if (
+        toDate.valueOf() == new Date().valueOf() &&
+        fromDate.valueOf() == oneMonthBackDate.valueOf()
+      ) {
+        console.log("equal");
+        console.log(fromDate.getDate() + " and " + new Date().getDate());
+        await preparePdf(fromDateEntry, toDateEntry, filteredPaymentHistory);
+      } else {
+        console.log("subset");
+        console.log(
+          toDate.valueOf() +
+            "and" +
+            new Date().valueOf() +
+            "also" +
+            fromDate.valueOf() +
+            "and" +
+            oneMonthBackDate.valueOf()
+        );
+        toDate.setDate(toDate.getDate() + 1);
+        filteredPaymentHistory = paymentHistory.filter(
+          (paymentDetail) =>
+            paymentDetail.paymentDateTimestampString >= fromDate.valueOf() &&
+            paymentDetail.paymentDateTimestampString < toDate.valueOf()
+        );
+        await preparePdf(fromDateEntry, toDateEntry, filteredPaymentHistory);
+      }
+    }
+    console.log("PDF generated");
+  };
+  // const filterBasedOnFromAndToDate = (fromDate, toDate) => {
+  //   console.log("inside filterBasedOnFromAndToDate");
+  //   return (
+  //     paymentDetail.paymentDateTimestampString >= fromDate.valueOf() &&
+  //     paymentDetail.paymentDateTimestampString <= toDate.valueOf()
+  //   );
+  // };
   const changeSelectedFromDate = (event, selectedDate) => {
     setDisplayFromDatePicker(false);
     const currentDate = selectedDate || fromDate;
@@ -204,11 +259,11 @@ export default function ExportPaymenttOverlay({ toggleExportPaymentOverlay,prepa
       parseInt(currentDate.getMonth() + 1) +
       "/" +
       currentDate.getFullYear();
+    setFromDate(currentDate);
     setFromDateEntry(dateString);
     setFromDateTimeStampString(currentDate.valueOf());
     console.log("selectd from Date is", selectedDate);
     console.log("selectd from Date is string ", dateString);
-    
   };
 
   const changeSelectedToDate = (event, selectedDate) => {
@@ -220,12 +275,11 @@ export default function ExportPaymenttOverlay({ toggleExportPaymentOverlay,prepa
       parseInt(currentDate.getMonth() + 1) +
       "/" +
       currentDate.getFullYear();
-      setToDateEntry(dateString);
-      setToDateTimeStampString(currentDate.valueOf());
-      console.log("selectd to Date is", selectedDate);
-      console.log("selectd to Date is string ", dateString);
-      
-    
+    setToDateEntry(dateString);
+    setToDate(currentDate);
+    setToDateTimeStampString(currentDate.valueOf());
+    console.log("selectd to Date is", selectedDate);
+    console.log("selectd to Date is string ", dateString);
   };
 
   return (
@@ -253,11 +307,18 @@ export default function ExportPaymenttOverlay({ toggleExportPaymentOverlay,prepa
           }}
         >
           <FormView>
-         
-            <View style={{wwidth: "100%", flexDirection:"row",justifyContent:"flex-start",alignItems:"flex-start"}}><Text variant="title">From</Text></View>
             <View
               style={{
-                
+                wwidth: "100%",
+                flexDirection: "row",
+                justifyContent: "flex-start",
+                alignItems: "flex-start",
+              }}
+            >
+              <Text variant="title">From</Text>
+            </View>
+            <View
+              style={{
                 backgroundColor: "white",
                 marginTop: 8,
                 flexDirection: "row",
@@ -265,7 +326,6 @@ export default function ExportPaymenttOverlay({ toggleExportPaymentOverlay,prepa
                 justifyContent: "center",
               }}
             >
-              
               <TouchableOpacity onPress={openFromDatePicker}>
                 <MaterialIcons name="date-range" size={40} color="#689F38" />
               </TouchableOpacity>
@@ -285,12 +345,20 @@ export default function ExportPaymenttOverlay({ toggleExportPaymentOverlay,prepa
                 textColor="#689F38"
                 activeUnderlineColor="#689F38"
               />
-              
             </View>
-            <View style={{wwidth: "100%",marginTop:10, flexDirection:"row",justifyContent:"flex-start",alignItems:"flex-start"}}><Text variant="title">To</Text></View>
             <View
-               style={{
-               
+              style={{
+                wwidth: "100%",
+                marginTop: 10,
+                flexDirection: "row",
+                justifyContent: "flex-start",
+                alignItems: "flex-start",
+              }}
+            >
+              <Text variant="title">To</Text>
+            </View>
+            <View
+              style={{
                 backgroundColor: "white",
                 marginTop: 8,
                 flexDirection: "row",
@@ -298,7 +366,6 @@ export default function ExportPaymenttOverlay({ toggleExportPaymentOverlay,prepa
                 justifyContent: "center",
               }}
             >
-             
               <TouchableOpacity onPress={openToDatePicker}>
                 <MaterialIcons name="date-range" size={40} color="#689F38" />
               </TouchableOpacity>
@@ -318,7 +385,6 @@ export default function ExportPaymenttOverlay({ toggleExportPaymentOverlay,prepa
                 textColor="#689F38"
                 activeUnderlineColor="#689F38"
               />
-              
             </View>
 
             {isDisplayFromDatePicker && (
@@ -341,7 +407,7 @@ export default function ExportPaymenttOverlay({ toggleExportPaymentOverlay,prepa
                 onChange={changeSelectedToDate}
               />
             )}
-            
+
             <TextInput
               style={{
                 width: "100%",
@@ -360,7 +426,21 @@ export default function ExportPaymenttOverlay({ toggleExportPaymentOverlay,prepa
           </FormView>
         </ScrollView>
         <SubmitButton onPress={handleSubmit} disabled={isLoading}>
-         {!isLoading? <SubmitButtonText>Export</SubmitButtonText> : <ActivityIndicator size="large" color="#FFFFFF" style={{position:"absolute",right:'50%',left:'50%',top:'50%',bottom:'50%'}}/>} 
+          {!isLoading ? (
+            <SubmitButtonText>Export</SubmitButtonText>
+          ) : (
+            <ActivityIndicator
+              size="large"
+              color="#FFFFFF"
+              style={{
+                position: "absolute",
+                right: "50%",
+                left: "50%",
+                top: "50%",
+                bottom: "50%",
+              }}
+            />
+          )}
         </SubmitButton>
       </MainView>
     </Overlay>
