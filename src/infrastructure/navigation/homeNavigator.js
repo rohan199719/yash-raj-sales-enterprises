@@ -1,11 +1,12 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-
+import { useEffect,useContext } from "react";
 import { Text, View } from "react-native";
 import Dealers from "../../features/dealer/screens/dealers";
 import Payments from "../../features/dealer/screens/payments";
 import Orders from "../../features/dealer/screens/orders";
 import DealerDetails from "../../features/dealer/screens/dealerDetails";
+import { AuthenticationContext } from "../../services/authentication/authentication.context";
 import Root from "../../features/home/screens/root";
 const Stack = createStackNavigator();
 
@@ -24,7 +25,9 @@ const DealerDetailsScreen = () => {
   );
 };
 
-export const HomeNavigator = () => (
+export const HomeNavigator = () => {
+  const { isAuthenticated } = useContext(AuthenticationContext);
+  return(
   <Stack.Navigator>
     <Stack.Screen
       name="Root"
@@ -72,7 +75,7 @@ export const HomeNavigator = () => (
       name="Payments"
       component={Payments}
       options={{
-        title: "Payment History",
+        title: "PAYMENT HISTORY",
         headerStyle: {
           backgroundColor: "#689F38",
         },
@@ -98,3 +101,4 @@ export const HomeNavigator = () => (
     />
   </Stack.Navigator>
 );
+    };

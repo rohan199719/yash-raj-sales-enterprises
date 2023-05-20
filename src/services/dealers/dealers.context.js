@@ -1,5 +1,5 @@
-import React, { useState, createContext, useEffect } from "react";
-
+import React, { useState,createContext, useEffect,useRef } from "react";
+import   useStateref  from "react-usestateref";
 import { GetDealers, updatedealerInfo,AddDealers } from "./dealers.service";
 import { getAuth } from "firebase/auth";
 export const DealersContext = createContext();
@@ -8,6 +8,7 @@ export const DealerContextProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [dealers, setDealers] = useState(null);
   const [error, setError] = useState(null);
+  const  [addDelerError,setAddDelerError] = useState("");
   const updateDelearDueAmountById = (dealer) => {
     setIsLoading(true);
     console.log(
@@ -18,27 +19,19 @@ export const DealerContextProvider = ({ children }) => {
       .then(() => {
         console.log("dealer due amount info updated");
         setIsLoading(false);
+        
       })
       .catch((e) => {
         setIsLoading(false);
         setError(e.toString());
+        
         console.log(e);
       });
   };
- const AddNewDealer = (newDealer)=>{
-  setIsLoading(true);
+ const AddNewDealer = async (newDealer)=>{
+  //setIsLoading(true);
   console.log("in function Add dealers in context");
-  AddDealers(newDealer)
-    .then(() => {
-      console.log("dealer due amount info updated");
-      setIsLoading(false);
-    })
-    .catch((e) => {
-      setIsLoading(false);
-      setError(e.toString());
-      console.log(e);
-    });
-
+  return AddDealers(newDealer);
  };
 
   const fetchDealers = () => {
@@ -54,7 +47,7 @@ export const DealerContextProvider = ({ children }) => {
           dealerList.push({ ...dealer, id: doc.id });
         });
         setDealers(dealerList);
-        console.log("dealer fron db is ", dealerList);
+
         setIsLoading(false);
       })
       .catch((e) => {
@@ -70,6 +63,8 @@ export const DealerContextProvider = ({ children }) => {
         dealers,
         isLoading,
         error,
+        addDelerError,
+        setAddDelerError,
         fetchDealers,
         AddNewDealer,
         updateDelearDueAmountById,

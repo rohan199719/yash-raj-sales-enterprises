@@ -192,6 +192,11 @@ export default function AddOrderFormOverlay({ toggleOrderOverlay, dealer }) {
       setProductInputValidationError("netPrice invalid");
       return false;
     }
+    if (AuthPIN === "") {
+      console.log("AuthPIN is mandatory");
+      setInputValidationError("AuthPIN is mandatory");
+      return false;
+    }
     return true;
   };
 
@@ -267,20 +272,32 @@ export default function AddOrderFormOverlay({ toggleOrderOverlay, dealer }) {
         orderDate: orderDate,
         orderDateTimestampString: mydate.valueOf(),
         orderDateTimestamp: Timestamp.fromDate(mydate),
+        AuthPIN:AuthPIN
       };
-      AddNewOrderCall(newOrder);
+      AddNewOrder(newOrder)
+      .then(() => {
       console.log("AddNewOrderCall sucess");
       const newDueAmount =
         Number(dealer.dueAmount) + Number(netBillingAmmount);
       dealer.dueAmount = newDueAmount;
       dealer.lastOrderDate = orderDate;
       updateDelearDueAmountById(dealer);
-
       console.log("dealer due ammount add sucess");
       renderTaost("order added sucessfully");
       toggleOrderOverlay();
       fetchOrderHistoryByDealerId(dealer.dealerId);
-      console.log("is loading is " + isLoading);
+      })
+      .catch((error) => {
+        console.log("ERROR WHILE ADDING ORDER- "+error);
+      if(error.toString().includes("permission-denied")){
+        renderTaost("Permisson denied");
+      }else{
+        renderTaost("ERROR WHILE ADDING ORDER- "+error);
+      }
+      
+    });
+  
+      
    
   } else {
     console.log("error flag is " + inputValidationError);
@@ -299,7 +316,7 @@ const handleSubmitPrev = () => {
      
       orderDateTimestamp: Timestamp.fromDate(mydate),
     };
-    AddNewOrderCall(newOrder);
+    AddNewOrder(newOrder);
     console.log("addNewOrderSucess is ", addNewOrderSucess);
     while (addNewOrderApiCallInprogress) {
       console.log("isLaoding loop to wait");
@@ -326,9 +343,7 @@ const handleSubmitPrev = () => {
     return;
   }
 };
-const AddNewOrderCall = (newOrder) => {
-  AddNewOrder(newOrder);
-};
+
 
 const calculateNetPrice = (quantity, pricePerUnit) => {
   (quantity, pricePerUnit) => {
@@ -426,7 +441,7 @@ return (
                 underlineColorAndroid: "transparent",
                 backgroundColor: "#DCEDC8",
               }}
-              label="Order Date"
+              label="Order Date *"
               value={orderDate}
               onChangeText={(txt) => {
                 setOrderDate(txt);
@@ -454,7 +469,7 @@ return (
                   backgroundColor: "#DCEDC8",
                   marginHorizontal: 8,
                 }}
-                label={<Text style={{ fontSize: 15 }}>Product Name</Text>}
+                label={<Text style={{ fontSize: 15 }}>Product Name *</Text>}
                 value={productName}
                 onChangeText={(txt) => {
                   setProductName(txt);
@@ -469,7 +484,7 @@ return (
                     backgroundColor: "#DCEDC8",
                     marginRight: 8,
                   }}
-                  label={<Text style={{ fontSize: 12 }}>Units</Text>}
+                  label={<Text style={{ fontSize: 12 }}>Units*</Text>}
                   value={quantity}
                   onChangeText={(txt) => {
                     setQuantity(txt);
@@ -487,7 +502,7 @@ return (
                     backgroundColor: "#DCEDC8",
                     marginRight: 8,
                   }}
-                  label={<Text style={{ fontSize: 12 }}>Unit Name</Text>}
+                  label={<Text style={{ fontSize: 11 }}>Unit Name*</Text>}
                   value={unitName}
                   onChangeText={(txt) => {
                     setUnitName(txt);
@@ -500,7 +515,7 @@ return (
                     flex: 1,
                     backgroundColor: "#DCEDC8",
                   }}
-                  label={<Text style={{ fontSize: 12 }}>Price/unit</Text>}
+                  label={<Text style={{ fontSize: 11 }}>Price/unit *</Text>}
                   value={pricePerUnit}
                   onChangeText={(txt) => {
                     setPricePerUnit(txt);
@@ -518,7 +533,7 @@ return (
                     flex: 2,
                     backgroundColor: "#DCEDC8",
                   }}
-                  label={<Text style={{ fontSize: 15 }}>Net Price</Text>}
+                  label={<Text style={{ fontSize: 15 }}>Net Price*</Text>}
                   value={netPrice}
                   disabled="true"
                   keyboardType="number-pad"
@@ -590,7 +605,7 @@ return (
               backgroundColor: "#DCEDC8",
               marginTop: 8,
             }}
-            label="Net Billing Amount"
+            label="Net Billing Amount *"
             value={netBillingAmmount}
             disabled="true"
             textColor="#689F38"
@@ -627,7 +642,7 @@ return (
               backgroundColor: "#DCEDC8",
               marginTop: 8,
             }}
-            label="Autherization PIN"
+            label="Autherization PIN *"
             value={AuthPIN}
             onChangeText={(txt) => {
               setAuthPIN(txt);

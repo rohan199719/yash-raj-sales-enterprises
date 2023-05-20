@@ -100,6 +100,7 @@ export default function AddDealerFormOverlay({ toggleAddDealerOverlay }) {
   const [dueAmount, setDueAmount] = useState("0");
   const [dealerId, setDealerId] = useState("");
   const [mobileNumer, setmobileNumer] = useState("");
+  const [emailId, setEmailId] = useState("");
   const [name, setName] = useState("");
   const [nickname, setNickname] = useState("");
   const [buisnessName, setBuisnessName] = useState("");
@@ -111,16 +112,26 @@ export default function AddDealerFormOverlay({ toggleAddDealerOverlay }) {
   const [displaymode, setMode] = useState("date");
   const [isDisplayDatePicker, setDisplayDatePicker] = useState(false);
   const [inputValidationError, setInputValidationError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     isLaodingDealer,
     errorDealer,
     successDealerDb,
     AddNewDealer,
+    setAddDelerError,
+    addDelerError,
     fetchDealers
   } = useContext(DealersContext);
 
+  useEffect(() => {
+    setAddDelerError("");
+    console.log("deleare add overlay relaoded");
+  }, []);
 
+  const isValidEmailId=()=>{
+    return /\S+@\S+\.\S+/.test(emailId);
+  }
   const isInputValid = () => {
     if (name === "") {
       console.log("name is mandatory");
@@ -137,6 +148,11 @@ export default function AddDealerFormOverlay({ toggleAddDealerOverlay }) {
       setInputValidationError("mobile number invalid");
       return false;
     }
+    if (emailId != "" && !isValidEmailId()) {
+      console.log("incorrect EmailId");
+      setInputValidationError("incorrect email id");
+      return false;
+    }
     if (address === "") {
       console.log("address is mandatory");
       setInputValidationError("address is mandatory");
@@ -148,6 +164,12 @@ export default function AddDealerFormOverlay({ toggleAddDealerOverlay }) {
       setInputValidationError("dueAmount invalid");
       return false;
     }
+    if (AuthPIN === "") {
+      console.log("AuthPIN is mandatory");
+      setInputValidationError("AuthPIN is mandatory");
+      return false;
+    }
+    setInputValidationError("");
     return true;
   };
 
@@ -163,13 +185,15 @@ export default function AddDealerFormOverlay({ toggleAddDealerOverlay }) {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    setIsLoading(true);
     if (isInputValid()) {
       const newDealer = {
         dealerId: "DL-",
         name: name,
         nickname: nickname,
         mobleNumer: mobileNumer,
+        emailId:emailId,
         buisnessName: buisnessName,
         dueAmount: dueAmount!=""?dueAmount:0,
         address: address,
@@ -178,17 +202,32 @@ export default function AddDealerFormOverlay({ toggleAddDealerOverlay }) {
         entryDateTimestampString: mydate.valueOf(),
         entryDateTimestamp: Timestamp.fromDate(mydate),
         lastPaymentDate:"NA",
-        lastFollow:"NA",    
+        lastFollow:"NA",
+        AuthPIN:AuthPIN  
         };
       newDealer.dealerId=newDealer.dealerId + newDealer.entryDateTimestampString
-      AddNewDealerCall(newDealer);
-      console.log("AddNewDealerCall sucess");
-      renderTaost("Dealer added sucessfully");
-      toggleAddDealerOverlay();
-      fetchDealers();
-
+         AddNewDealer(newDealer)
+         .then(() => {
+          console.log("dealer due amount info updated");
+          console.log("AddNewDealerCall sucess");
+          renderTaost("Dealer added sucessfully");
+           toggleAddDealerOverlay();
+           fetchDealers();
+           setIsLoading(false);
+        })
+        .catch((e) => {
+          
+          console.log("ERROR WHILE ADDING DEALER- "+e);
+          if(e.toString().includes("permission-denied")){
+            renderTaost("Permisson denied");
+          }else{
+            renderTaost("ERROR WHILE ADDING DEALER- "+e);
+          }
+          setIsLoading(false);
+        });
     } else {
       console.log("error flag is " + inputValidationError);
+      setIsLoading(false);
       return;
     }
   };
@@ -244,7 +283,7 @@ export default function AddDealerFormOverlay({ toggleAddDealerOverlay }) {
                 marginTop: 8,
          
               }}
-              label="Dealer Name"
+              label="Dealer Name*"
               value={name}
               textColor="#689F38"
               activeUnderlineColor="#689F38"
@@ -274,7 +313,7 @@ export default function AddDealerFormOverlay({ toggleAddDealerOverlay }) {
                 marginTop: 8,
         
               }}
-              label="Mobile Number"
+              label="Mobile Number*"
               value={mobileNumer}
               textColor="#689F38"
               activeUnderlineColor="#689F38"
@@ -290,7 +329,22 @@ export default function AddDealerFormOverlay({ toggleAddDealerOverlay }) {
                 marginTop: 8,
         
               }}
-              label="Buisness Name"
+              label="Email Id"
+              value={emailId}
+              textColor="#689F38"
+              activeUnderlineColor="#689F38"
+              onChangeText={(txt) => {
+                setEmailId(txt);
+              }}
+            />
+            <TextInput
+              style={{
+                width: "100%",
+                backgroundColor: "#DCEDC8",
+                marginTop: 8,
+        
+              }}
+              label="Buisness Name*"
               value={buisnessName}
               textColor="#689F38"
               activeUnderlineColor="#689F38"
@@ -305,7 +359,7 @@ export default function AddDealerFormOverlay({ toggleAddDealerOverlay }) {
                 marginTop: 8,
      
               }}
-              label="address"
+              label="address*"
               value={address}
               textColor="#689F38"
               activeUnderlineColor="#689F38"
@@ -330,7 +384,7 @@ export default function AddDealerFormOverlay({ toggleAddDealerOverlay }) {
                   underlineColorAndroid: "transparent",
                   backgroundColor: "#DCEDC8",
                 }}
-                label="Entry Date"
+                label="Entry Date*"
                 value={entryDate}
                 onChangeText={(txt) => {
                   setEntryDate(txt);
@@ -390,7 +444,7 @@ export default function AddDealerFormOverlay({ toggleAddDealerOverlay }) {
                 backgroundColor: "#DCEDC8",
                 marginTop: 8,
               }}
-              label="Autherization PIN"
+              label="Autherization PIN*"
               value={AuthPIN}
               onChangeText={(txt) => {
                 setAuthPIN(txt);
@@ -401,8 +455,8 @@ export default function AddDealerFormOverlay({ toggleAddDealerOverlay }) {
             />
           </FormView>
         </ScrollView>
-        <SubmitButton onPress={handleSubmit}>
-          <SubmitButtonText>Submit</SubmitButtonText>
+        <SubmitButton onPress={handleSubmit} disabled={isLoading}>
+         {!isLoading? <SubmitButtonText>Submit</SubmitButtonText> : <ActivityIndicator size="large" color="#FFFFFF" style={{position:"absolute",right:'50%',left:'50%',top:'50%',bottom:'50%'}}/>} 
         </SubmitButton>
       </MainView>
     </Overlay>

@@ -8,9 +8,11 @@ import {
   Button,
   ButtonText,
 } from "./welcome.style";
-
+import { AuthenticationContext } from "../../../services/authentication/authentication.context";
+import { useEffect,useContext } from "react";
 import { ToastAndroid, Platform, AlertIOS } from "react-native";
 export default function Welcome({ navigation }) {
+  const { isAuthenticated } = useContext(AuthenticationContext);
   const renderTaost = () => {
     if (Platform.OS === "android") {
       ToastAndroid.show("coming soon", ToastAndroid.SHORT);

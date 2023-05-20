@@ -89,6 +89,13 @@ export default function DealerDetails({ navigation, route }) {
       AlertIOS.alert("coming soon");
     }
   };
+  const renderErrorToast = (message) => {
+    if (Platform.OS === "android") {
+      ToastAndroid.show(message, ToastAndroid.SHORT);
+    } else {
+      AlertIOS.alert(message);
+    }
+  };
   const {
     paymentHistoryDealerSpecific,
     isLoading,
@@ -134,8 +141,9 @@ export default function DealerDetails({ navigation, route }) {
   const submitNewPayment = (paymentHistory) => {
     console.log("inside submitNewPayment");
     //fetchPaymentHistoryByDealerId(dealer.dealerId);
-    AddNewPaymentHistory(paymentHistory);
-    console.log("payment add sucess");
+    AddNewPaymentHistory(paymentHistory)
+    .then(() => {
+      console.log("payment add sucess");
     togglePaymentOverlay();
     renderCustomTaost("payment added sucessfully");
     console.log("payment history after additing payment is", paymentHistory);
@@ -153,6 +161,18 @@ export default function DealerDetails({ navigation, route }) {
     updateDelearDueAmountById(dealer);
     console.log("dealer info uploaded after payment add");
     console.log("is loading is " + isLoading);
+    fetchPaymentHistoryByDealerId(dealer.dealerId);
+    })
+    .catch((e) => {
+      console.log("ERROR WHILE ADDING PAYMENT- "+e);
+      if(e.toString().includes("permission-denied")){
+        renderErrorToast("Permisson denied");
+      }else{
+        renderErrorToast("ERROR WHILE ADDING PAYMENT- "+e);
+      }
+      
+    });
+    
 
   };
   const submitNewPaymentPrev = (paymentHistory) => {
@@ -207,7 +227,7 @@ export default function DealerDetails({ navigation, route }) {
     <MainView>
       <DividertertiarySmall />
       <TitleView>
-        <Text variant="title_white">{dealer.buisnessName}</Text>
+        <Text variant="title_white">{dealer.buisnessName.toUpperCase()}</Text>
       </TitleView>
       <TopView>
         <Ionicons name="ios-person-circle" size={92} color="#689F38" />
@@ -391,8 +411,6 @@ export default function DealerDetails({ navigation, route }) {
       )}
 
 
-
-      {error && <Text>error</Text>}
 
       {AddPaymentOverlayOpened && (
         <AddPaymentFormOverlay

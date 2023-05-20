@@ -78,6 +78,10 @@ export default function AddPaymentFormOverlay({
   const [displaymode, setMode] = useState("date");
   const [isDisplayDatePicker, setDisplayDatePicker] = useState(false);
   const [inputValidationError, setInputValidationError] = useState("");
+  const [paymentMode, setPaymentMode] = useState("");
+  const [recievedBy, setRecievedBy] = useState("");
+  
+  
   const {
     isLoading,
     error,
@@ -98,6 +102,16 @@ export default function AddPaymentFormOverlay({
       setInputValidationError("recieved amount is mandatory");
       return false;
     }
+    if (recievedBy === "") {
+      console.log("Recieved by is mandatory");
+      setInputValidationError("Recieved by is mandatory");
+      return false;
+    }
+    if (paymentMode === "") {
+      console.log("payment mode is mandatory");
+      setInputValidationError("payment mode is mandatory");
+      return false;
+    }
     if (PaymentDate === "") {
       console.log("payment date is mandatory");
       setInputValidationError("payment date is mandatory");
@@ -108,12 +122,18 @@ export default function AddPaymentFormOverlay({
       setInputValidationError("recieved amount invalid");
       return false;
     }
+    if (AuthPIN === "") {
+      console.log("AuthPIN is mandatory");
+      setInputValidationError("AuthPIN is mandatory");
+      return false;
+    }
+    setInputValidationError("");
     return true;
   };
   const  handleSubmit = async () => {
     if (isInputValid()) {
       const remainingDue = Number(dealer.dueAmount) - Number(PaidAmount);
-      console.log("remaining diue amount is ", remainingDue);
+      console.log("remaining due amount to update is: ", remainingDue);
       const newPaymentHistory = {
         dealerId: dealer.dealerId,
         dealerName: dealer.name,
@@ -123,10 +143,13 @@ export default function AddPaymentFormOverlay({
         paymentDate: PaymentDate,
         paymentDateTimestampString:mydate.valueOf(),
         paymentDateTimestamp: Timestamp.fromDate(mydate),
+        AuthPIN:AuthPIN,
+        recievedBy:recievedBy,
+        paymentMode:paymentMode
       };
       dealer.dueAmount = remainingDue;
       await submitNewPayment(newPaymentHistory);
-      fetchPaymentHistoryByDealerId(dealer.dealerId);
+      // fetchPaymentHistoryByDealerId(dealer.dealerId);
     } else {
       console.log("error flag is " + inputValidationError);
       return;
@@ -207,7 +230,7 @@ export default function AddPaymentFormOverlay({
                 marginTop: 8,
                 opacity: 0.6,
               }}
-              label="Dealer Id"
+              label="Dealer Id*"
               value={dealer.dealerId}
               disabled="true"
               textColor="#689F38"
@@ -220,7 +243,7 @@ export default function AddPaymentFormOverlay({
                 marginTop: 8,
                 opacity: 0.6,
               }}
-              label="Dealer Name"
+              label="Dealer Name*"
               value={dealer.name.toUpperCase()}
               disabled="true"
               textColor="#689F38"
@@ -232,12 +255,40 @@ export default function AddPaymentFormOverlay({
                 backgroundColor: "#DCEDC8",
                 marginTop: 8,
               }}
-              label="Recieving Amount"
+              label="Recieving Amount*"
               value={PaidAmount}
               onChangeText={(txt) => {
                 setPaidAmount(txt);
               }}
               keyboardType="number-pad"
+              textColor="#689F38"
+              activeUnderlineColor="#689F38"
+            />
+            <TextInput
+              style={{
+                width: "100%",
+                backgroundColor: "#DCEDC8",
+                marginTop: 8,
+              }}
+              label="Recieved By*"
+              value={recievedBy}
+              onChangeText={(txt) => {
+                setRecievedBy(txt);
+              }}
+              textColor="#689F38"
+              activeUnderlineColor="#689F38"
+            />
+            <TextInput
+              style={{
+                width: "100%",
+                backgroundColor: "#DCEDC8",
+                marginTop: 8,
+              }}
+              label="Payment Mode*"
+              value={paymentMode}
+              onChangeText={(txt) => {
+                setPaymentMode(txt);
+              }}
               textColor="#689F38"
               activeUnderlineColor="#689F38"
             />
@@ -257,7 +308,7 @@ export default function AddPaymentFormOverlay({
                   underlineColorAndroid: "transparent",
                   backgroundColor: "#DCEDC8",
                 }}
-                label="Payment Date"
+                label="Payment Date*"
                 value={PaymentDate}
                 onChangeText={(txt) => {
                   setPaymentDate(txt);
@@ -302,7 +353,7 @@ export default function AddPaymentFormOverlay({
                 backgroundColor: "#DCEDC8",
                 marginTop: 8,
               }}
-              label="Autherization PIN"
+              label="Autherization PIN*"
               value={AuthPIN}
               onChangeText={(txt) => {
                 setAuthPIN(txt);

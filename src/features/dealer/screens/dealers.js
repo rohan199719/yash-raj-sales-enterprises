@@ -56,14 +56,18 @@ export default function Dealers({ navigation }) {
   const { dealers, isLoading, error, fetchDealers } =
     useContext(DealersContext);
   return (isLoading? <ActivityIndicator size="large" color="#689F38" style={{position:"absolute",right:'50%',left:'50%',top:'50%',bottom:'50%'}}/> :
-    <View>
+    <View style={{flex:1}}>
       <Searchbar  placeholder="Search Dealers"
       placeholderTextColor={"#757575"}
+      
       onChangeText={onChangeSearch}
-      style={{backgroundColor:"#DCEDC8",margin:5}}
-      value={searchQuery}></Searchbar>
+      style={{backgroundColor:"#DCEDC8",margin:5, height:40, justifyContent: 'center',
+      alignItems: 'center'}}
+      inputStyle={{ textAlignVertical: 'center' }}
+      value={searchQuery}/>
       <FlatList
         data={filteredDealer==null?dealers:filteredDealer}
+        
         renderItem={({ item }) => {
           return (
             <TouchableOpacity
@@ -98,8 +102,8 @@ style={{
   justifyContent: 'center',
   alignItems: 'center',
   borderRadius: 30,
-  backgroundColor: "#4C4B16",
-   bottom: 72,
+  backgroundColor: "#689F38",
+   bottom: 40,
   right: 12,
   elevation: 16,
   borderWidth: 3,
@@ -118,6 +122,9 @@ style={{
           toggleAddDealerOverlay={toggleAddDealerOverlay}
         />
       )}
+    {/* { error && <View><Text>{error}</Text></View>} */}
     </View>
+
+  
   );
 }

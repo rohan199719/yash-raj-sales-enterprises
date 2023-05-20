@@ -19,8 +19,6 @@ export const GetPaymentHistoryByDealerId = (d_id) => {
     where("dealerId", "==", d_id),
     orderBy("paymentDateTimestamp", "desc")
   );
-  console.log("query formed is ", q);
-  console.log("after query formed");
   return getDocs(q);
 };
 
@@ -32,8 +30,7 @@ export const GetPaymentHistory = () => {
 
   var now = new Date();
   const thirtyDayAgo = new Date().setDate(now.getDate()-30);
-      console.log("line is 43 ");
-  console.log(thirtyDayAgo.valueOf());
+  console.log(thirtyDayAgo);
  
   const q = query(
     colref,

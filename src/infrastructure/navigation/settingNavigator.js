@@ -1,19 +1,16 @@
 import { createStackNavigator } from "@react-navigation/stack";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { useEffect,useContext } from "react";
-import { Text, View } from "react-native";
-import Menu from "../../features/menu/screens/menu";
+import Setting from "../../features/settings/screens/setting";
 
 const Stack = createStackNavigator();
 
 
 
-export const MenuNavigator = () => {
+export const SettingNavigator = () => {
   return(
   <Stack.Navigator>
     <Stack.Screen
-      name="MenuScreen"
-      component={Menu}
+      name="SettingScreen"
+      component={Setting}
       options={{
         title: "YASH RAJ SALES ENTERPRISES",
         headerStyle: {

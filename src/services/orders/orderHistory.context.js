@@ -74,7 +74,7 @@ export const OrderHistoryContextProvider = ({ children }) => {
 
 
   const AddNewOrder = (orderHistory) => {
-    setIsLoading(true);
+
     console.log(
       "AddNewOrderApiCallInprogress was",
       addNewOrderApiCallInprogress
@@ -88,23 +88,9 @@ export const OrderHistoryContextProvider = ({ children }) => {
       "set AddNewOrderApiCallInprogress to ",
       addNewOrderApiCallInprogress
     );
-    AddNewOrderService(orderHistory)
-      .then(() => {
-        console.log("addNewOrderSucess before setting", addNewOrderSucess);
-        setAddNewOrderSucess(true);
-        console.log("addNewOrderSucess set to", addNewOrderSucess);
-        setSucess(true);
-        setIsLoading(false);
-        setAddNewOrderApiCallInprogress(false);
-      })
-      .catch((error) => {
-        setSucess(false);
-        setIsLoading(false);
-        setAddNewOrderApiCallInprogress(false);
-        setError(e.toString());
-        console.log(e);
-      });
+    return AddNewOrderService(orderHistory);
   };
+  
   return (
     <OrderHistoryContext.Provider
       value={{

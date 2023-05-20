@@ -59,7 +59,7 @@ export default function DealerInfoCard({ dealer = {} }) {
             }}
           >
             <Text variant="title" adjustsFontSizeToFit numberOfLines={2}>
-              {buisnessName}
+              {buisnessName.toUpperCase()}
             </Text>
             <Text
               style={{ marginBottom: 4 }}

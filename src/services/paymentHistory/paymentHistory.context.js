@@ -50,8 +50,9 @@ export const PaymentHistoryContextProvider = ({ children }) => {
         snapshot.docs.forEach((doc) => {
           paymentHistoryList.push({ ...doc.data(), id: doc.id });
         });
+        
         setPaymentHistory(paymentHistoryList);
-        console.log("payment history lis after fetch is ",paymentHistoryList);
+        console.log("payment history list count after fetch is ",paymentHistoryList.length);
         setIsLoading(false);
         setSucess(true);
       })
@@ -65,22 +66,12 @@ export const PaymentHistoryContextProvider = ({ children }) => {
   };
 
   const AddNewPaymentHistory = (paymentHistory) => {
-    setIsLoading(true);
     console.log(
       "in function AddNewPaymentHistory in PaymentHistoryContext for",
       paymentHistory.dealerId
     );
-    AddPaymentHistory(paymentHistory)
-      .then(() => {
-        setSucess(true);
-        setIsLoading(false);
-      })
-      .catch((e) => {
-        setSucess(false);
-        setIsLoading(false);
-        setError(e.toString());
-        console.log(e);
-      });
+    return AddPaymentHistory(paymentHistory);
+      
   };
   return (
     <PaymentHistoryContext.Provider
