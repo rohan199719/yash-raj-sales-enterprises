@@ -1,8 +1,9 @@
-import React, { useState, createContext,useEffect } from "react";
+import React, { useState, createContext, useEffect } from "react";
 import {
   GetOrderHistoryByDealerId,
   AddNewOrderService,
-  GetOrderHistory
+  GetOrderHistory,
+  GetOrderHistoryWithFilter,
 } from "./orderHistory.service";
 import { onSnapshot } from "firebase/firestore";
 export const OrderHistoryContext = createContext();
@@ -10,16 +11,18 @@ export const OrderHistoryContext = createContext();
 export const OrderHistoryContextProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [orderHistory, setOrderHistory] = useState(null);
-  const [orderHistoryDealerSpecific, setOrderHistoryDealerSpecific] = useState(null);
+  const [orderHistoryDealerSpecific, setOrderHistoryDealerSpecific] =
+    useState(null);
   const [error, setError] = useState(null);
   const [sucess, setSucess] = useState(false);
-  const [isOrderHistoryCallLoading, setIsOrderHistoryCallLoading] = useState(false);
+  const [isOrderHistoryCallLoading, setIsOrderHistoryCallLoading] =
+    useState(false);
   const [orderHistoryCallError, setOrderHistoryCallError] = useState(false);
   const [orderHistoryCallsucess, setOrderHistoryCallsucess] = useState(false);
   const [addNewOrderSucess, setAddNewOrderSucess] = useState(false);
   const [addNewOrderApiCallInprogress, setAddNewOrderApiCallInprogress] =
     useState(false);
-    
+
   const fetchOrderHistoryByDealerId = (dealerId) => {
     setIsOrderHistoryCallLoading(true);
     console.log(
@@ -49,8 +52,7 @@ export const OrderHistoryContextProvider = ({ children }) => {
 
   const fetchOrderHistory = () => {
     setIsLoading(true);
-    console.log(
-      "in function fetch fetchOrderHistory in context");
+    console.log("in function fetch fetchOrderHistory in context");
 
     GetOrderHistory()
       .then((snapshot) => {
@@ -71,10 +73,12 @@ export const OrderHistoryContextProvider = ({ children }) => {
         console.log(e);
       });
   };
-
+  const fetchOrderHistoryWithfilter = (fromDate, toDate) => {
+    console.log("in function fetch fetchOrderHistoryWithfilter in context");
+    return GetOrderHistoryWithFilter(fromDate, toDate);
+  };
 
   const AddNewOrder = (orderHistory) => {
-
     console.log(
       "AddNewOrderApiCallInprogress was",
       addNewOrderApiCallInprogress
@@ -90,7 +94,7 @@ export const OrderHistoryContextProvider = ({ children }) => {
     );
     return AddNewOrderService(orderHistory);
   };
-  
+
   return (
     <OrderHistoryContext.Provider
       value={{
@@ -105,7 +109,8 @@ export const OrderHistoryContextProvider = ({ children }) => {
         isOrderHistoryCallLoading,
         orderHistoryCallError,
         orderHistoryCallsucess,
-        fetchOrderHistory
+        fetchOrderHistory,
+        fetchOrderHistoryWithfilter,
       }}
     >
       {children}

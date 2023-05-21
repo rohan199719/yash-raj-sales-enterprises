@@ -29,7 +29,7 @@ import {
 } from "@expo/vector-icons";
 import { TextInput } from "react-native-paper";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { PaymentHistoryContext } from "../../../services/paymentHistory/paymentHistory.context";
+import { OrderHistoryContext } from "../../../services/orders/orderHistory.context";
 const MainView = styled(View)`
   height: 300px;
   width: 220px;
@@ -100,7 +100,7 @@ const ErrorMessageView = styled(View)`
   align-items: center;
   justify-content: flex-end;
 `;
-export default function ExportPaymenttOverlay({ toggleExportPaymentOverlay }) {
+export default function ExportOrderOverlay({ toggleExportOrderOverlay }) {
   const [fromDateEntry, setFromDateEntry] = useState("");
   const [toDateEntry, setToDateEntry] = useState("");
   const [toDateTimeStampString, setToDateTimeStampString] = useState("");
@@ -113,18 +113,17 @@ export default function ExportPaymenttOverlay({ toggleExportPaymentOverlay }) {
   const [isDisplayToDatePicker, setDisplayToDatePicker] = useState(false);
   const [inputValidationError, setInputValidationError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [filteredPaymentHistory, setFilteredPaymentHistory] = useState([]);
+  const [filteredOrderHistory, setFilteredOrderHistory] = useState([]);
 
   const {
-    paymentHistory,
+    orderHistory,
     error,
-    fetchPaymentHistory,
-    fetchPaymentHistoryWithfilter,
-    paymentHistoryWithFilter,
-  } = useContext(PaymentHistoryContext);
+    fetchOrderHistory,
+    fetchOrderHistoryWithfilter,
+  } = useContext(OrderHistoryContext);
 
   useEffect(() => {
-    console.log("export payment overlay relaoded");
+    console.log("export order overlay relaoded");
 
     const today = new Date();
     console.log("Before: ", today);
@@ -151,10 +150,10 @@ export default function ExportPaymenttOverlay({ toggleExportPaymentOverlay }) {
     setFromDateTimeStampString(today.valueOf());
     setFromDate(today);
     var reveresed = [];
-    paymentHistory.forEach((element) => {
+    orderHistory.forEach((element) => {
       reveresed.unshift(element);
     });
-    setFilteredPaymentHistory(reveresed);
+    setFilteredOrderHistory(reveresed);
   }, []);
 
   const isInputValid = () => {
@@ -217,27 +216,24 @@ export default function ExportPaymenttOverlay({ toggleExportPaymentOverlay }) {
     if (isInputValid()) {
       await generatePdf();
       setIsLoading(false);
-      toggleExportPaymentOverlay();
+      toggleExportOrderOverlay();
     } else {
       setIsLoading(false);
       return;
     }
   };
-  const retrievePaymentHistoryWithFilterAndPrepare = async (
-    fromDate,
-    toDate
-  ) => {
-    await fetchPaymentHistoryWithfilter(fromDate, toDate)
+  const retrieveOrderHistoryWithFilterAndPrepare = async (fromDate, toDate) => {
+    await fetchOrderHistoryWithfilter(fromDate, toDate)
       .then((snapshot) => {
-        const paymentHistoryList = [];
+        const orderHistoryList = [];
         snapshot.docs.forEach((doc) => {
-          paymentHistoryList.push({ ...doc.data(), id: doc.id });
+          orderHistoryList.push({ ...doc.data(), id: doc.id });
         });
         console.log(
-          "payment history list count after fetch is ",
-          paymentHistoryList.length
+          "order history list count after fetch is ",
+          orderHistoryList.length
         );
-        preparePdf(fromDateEntry, toDateEntry, paymentHistoryList.reverse());
+        preparePdf(fromDateEntry, toDateEntry, orderHistoryList.reverse());
       })
       .catch((e) => {
         console.log(e);
@@ -245,7 +241,7 @@ export default function ExportPaymenttOverlay({ toggleExportPaymentOverlay }) {
   };
   const generatePdf = async () => {
     console.log("generating PDF");
-    var filteredPaymentHistoryCopy = filteredPaymentHistory;
+    var filteredOrderHistoryCopy = filteredOrderHistory;
     toDate.setHours(0, 0, 0, 0);
     toDate.setDate(toDate.getDate() + 1);
     fromDate.setHours(0, 0, 0, 0);
@@ -254,7 +250,7 @@ export default function ExportPaymenttOverlay({ toggleExportPaymentOverlay }) {
     oneMonthBackDate.setHours(0, 0, 0, 0);
     if (fromDate.valueOf() < oneMonthBackDate.valueOf()) {
       console.log("fetch required");
-      await retrievePaymentHistoryWithFilterAndPrepare(fromDate, toDate);
+      await retrieveOrderHistoryWithFilterAndPrepare(fromDate, toDate);
     } else {
       var tommorowMidnight = new Date();
       tommorowMidnight.setHours(0, 0, 0, 0);
@@ -264,30 +260,22 @@ export default function ExportPaymenttOverlay({ toggleExportPaymentOverlay }) {
         fromDate.valueOf() == oneMonthBackDate.valueOf()
       ) {
         console.log("equal");
-        await preparePdf(
-          fromDateEntry,
-          toDateEntry,
-          filteredPaymentHistoryCopy
-        );
+        await preparePdf(fromDateEntry, toDateEntry, filteredOrderHistoryCopy);
       } else {
         console.log("subset");
-        filteredPaymentHistoryCopy = filteredPaymentHistoryCopy.filter(
-          (paymentDetail) =>
-            paymentDetail.paymentDateTimestampString >= fromDate.valueOf() &&
-            paymentDetail.paymentDateTimestampString < toDate.valueOf()
+        filteredOrderHistoryCopy = filteredOrderHistoryCopy.filter(
+          (orderDetail) =>
+            orderDetail.orderDateTimestampString >= fromDate.valueOf() &&
+            orderDetail.orderDateTimestampString < toDate.valueOf()
         );
-        await preparePdf(
-          fromDateEntry,
-          toDateEntry,
-          filteredPaymentHistoryCopy
-        );
+        await preparePdf(fromDateEntry, toDateEntry, filteredOrderHistoryCopy);
       }
     }
-    filteredPaymentHistoryCopy = [];
+    filteredOrderHistoryCopy = [];
     console.log("PDF generated");
   };
 
-  var paymentHistoryCount = 1;
+  var orderHistoryCount = 1;
   const months = [
     "JAN",
     "FEB",
@@ -311,27 +299,28 @@ export default function ExportPaymenttOverlay({ toggleExportPaymentOverlay }) {
     "Friday",
     "Saturday",
   ];
-  const paymentHistorydummy = [];
+  const orderHistorydummy = [];
   const officeAdress = " Daltonganj Ladi Palamu jharkhand 822101";
   const officeMobileNumberAndEmail = "Contact:08825189857";
   // Add payment objects to the paymentHistory array
-  paymentHistorydummy.push({
+  orderHistorydummy.push({
     dealerName: "John Doe",
-    dueAmount: 100,
-    paymentDate: "2023-05-01",
+    BillingAmount: 100,
+    orderDate: "2023-05-01",
   });
-  paymentHistorydummy.push({
+  orderHistorydummy.push({
     dealerName: "Jane Smith",
-    dueAmount: 200,
-    paymentDate: "2023-05-05",
+    BillingAmount: 200,
+    orderDate: "2023-05-05",
   });
 
   const preparePdf = async (
     fromDateEntry,
     toDateEntry,
-    filteredPaymentHistory
+    filteredOrdertHistory
   ) => {
     console.log("inside prepare pdf");
+
     const html = `<!DOCTYPE html>
     <html>
     <head>
@@ -348,6 +337,11 @@ export default function ExportPaymenttOverlay({ toggleExportPaymentOverlay }) {
         h3 {
           text-align: center;
           margin-top:0;
+        }
+        ul {
+          margin:0;
+          padding: 8px;
+          text-align: left;
         }
         hr {
           border: none;
@@ -373,49 +367,55 @@ export default function ExportPaymenttOverlay({ toggleExportPaymentOverlay }) {
       <h1>YASH RAJ SALES ENTERPRISES</h1>
 <h3>${officeAdress}</h3>
       <hr>
-      <h2>Payment History-    (From: ${fromDateEntry} To ${toDateEntry})</h2>
+      <h2>Order History-    (From: ${fromDateEntry} To ${toDateEntry})</h2>
       <table>
         <thead>
           <tr>
           <th>S.No.</th>
             <th>Dealer Name</th>
-            <th>Payment Date</th>
-            <th>Paid Amount</th>
-            <th>Recieved By</th>
-            <th>Payment mode</th>
+            <th>Order Date</th>
+            <th>Billing Amount</th>
+            <th>Ordered Products</th>
           </tr>
         </thead>
         <tbody>
           ${
-            filteredPaymentHistory
-              ? filteredPaymentHistory
+            filteredOrdertHistory
+              ? filteredOrdertHistory
                   .map(
-                    (payment) => `
+                    (order) => `
           <tr>
-          <td>${paymentHistoryCount++}</td>
-          <td>${payment.dealerName}</td>
+          <td>${orderHistoryCount++}</td>
+          <td>${order.dealerName}</td>
             <td>${
-              months[payment.paymentDateTimestamp.toDate().getMonth()]
-            }${" "}${payment.paymentDateTimestamp
+              months[order.orderDateTimestamp.toDate().getMonth()]
+            }${" "}${order.orderDateTimestamp
                       .toDate()
                       .getDate()
-                      .toString()}${" "}${payment.paymentDateTimestamp
+                      .toString()}${" "}${order.orderDateTimestamp
                       .toDate()
                       .getFullYear()
                       .toString()}</td>
-            <td>${payment.paymentAmount}</td>
-            <td>${payment.recievedBy}</td>
-            <td>${payment.paymentMode}</td>
+            <td>${order.netBillingAmount}</td>
+            <td>${order.orderedProducts
+              .map(
+                (orderProducts) => `<ul>
+            ${orderProducts.productName}${"- "}${orderProducts.units}${" "}${
+                  orderProducts.unitName
+                }
+          </ul>`
+              )
+              .join("")}</td>
           </tr>`
                   )
                   .join("")
-              : paymentHistorydummy
+              : orderHistorydummy
                   .map(
-                    (payment) => `
+                    (order) => `
           <tr>
-            <td>${payment.dealerName}</td>
-            <td>${payment.paymentAmount}</td>
-            <td>${payment.paymentDate}</td>
+            <td>${order.dealerName}</td>
+            <td>${order.BillingAmount}</td>
+            <td>${order.orderDate}</td>
           </tr>`
                   )
                   .join("")
@@ -431,7 +431,7 @@ export default function ExportPaymenttOverlay({ toggleExportPaymentOverlay }) {
       base64: false,
     });
     const fileName =
-      "PaymentHistory(" + fromDateEntry + " to " + toDateEntry + ").pdf";
+      "OrderHistory(" + fromDateEntry + " to " + toDateEntry + ").pdf";
     const newPath = FileSystem.documentDirectory + fileName;
     await FileSystem.copyAsync({
       from: file.uri,
@@ -477,8 +477,8 @@ export default function ExportPaymenttOverlay({ toggleExportPaymentOverlay }) {
     <Overlay>
       <MainView>
         <HeaderElement>
-          <Text variant="title">Export Payment History</Text>
-          <TouchableOpacity onPress={toggleExportPaymentOverlay}>
+          <Text variant="title">Export Order History</Text>
+          <TouchableOpacity onPress={toggleExportOrderOverlay}>
             <FontAwesome name="close" size={24} color="green" />
           </TouchableOpacity>
         </HeaderElement>

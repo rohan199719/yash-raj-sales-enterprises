@@ -25,21 +25,33 @@ export const GetPaymentHistoryByDealerId = (d_id) => {
 export const GetPaymentHistory = () => {
   console.log("in service method GetPaymentHistory");
   const db = getFirestore();
- 
+
   const colref = collection(db, "paymentHistory");
 
   var now = new Date();
-  const thirtyDayAgo = new Date().setDate(now.getDate()-30);
+  const thirtyDayAgo = new Date().setDate(now.getDate() - 30);
   console.log(thirtyDayAgo);
- 
+
   const q = query(
     colref,
-    where("paymentDateTimestampString", ">=",thirtyDayAgo.valueOf()),
+    where("paymentDateTimestampString", ">=", thirtyDayAgo.valueOf()),
     orderBy("paymentDateTimestampString", "desc")
   );
   return getDocs(q);
 };
 
+export const GetPaymentHistoryWithFilter = (fromDate, toDate) => {
+  console.log("in service method GetPaymentHistoryWithFilter");
+  const db = getFirestore();
+  const colref = collection(db, "paymentHistory");
+  const q = query(
+    colref,
+    where("paymentDateTimestampString", ">=", fromDate.valueOf()),
+    where("paymentDateTimestampString", "<", toDate.valueOf()),
+    orderBy("paymentDateTimestampString", "desc")
+  );
+  return getDocs(q);
+};
 
 export const AddPaymentHistory = (paymentHistory) => {
   console.log(

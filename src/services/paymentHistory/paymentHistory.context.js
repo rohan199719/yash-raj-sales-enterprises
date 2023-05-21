@@ -1,8 +1,9 @@
 import React, { useState, createContext } from "react";
 import {
   GetPaymentHistoryByDealerId,
+  GetPaymentHistoryWithFilter,
   AddPaymentHistory,
-  GetPaymentHistory
+  GetPaymentHistory,
 } from "./paymentHistory.service";
 import { onSnapshot } from "firebase/firestore";
 export const PaymentHistoryContext = createContext();
@@ -10,7 +11,10 @@ export const PaymentHistoryContext = createContext();
 export const PaymentHistoryContextProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [paymentHistory, setPaymentHistory] = useState(null);
-  const [paymentHistoryDealerSpecific, setPaymentHistoryDealerSpecific] = useState(null);
+  const [paymentHistoryWithFilter, setPaymentHistoryWithFilter] =
+    useState(null);
+  const [paymentHistoryDealerSpecific, setPaymentHistoryDealerSpecific] =
+    useState(null);
   const [error, setError] = useState(null);
   const [sucess, setSucess] = useState(false);
 
@@ -50,9 +54,12 @@ export const PaymentHistoryContextProvider = ({ children }) => {
         snapshot.docs.forEach((doc) => {
           paymentHistoryList.push({ ...doc.data(), id: doc.id });
         });
-        
+
         setPaymentHistory(paymentHistoryList);
-        console.log("payment history list count after fetch is ",paymentHistoryList.length);
+        console.log(
+          "payment history list count after fetch is ",
+          paymentHistoryList.length
+        );
         setIsLoading(false);
         setSucess(true);
       })
@@ -62,7 +69,11 @@ export const PaymentHistoryContextProvider = ({ children }) => {
         setError(e.toString());
         console.log(e);
       });
+  };
 
+  const fetchPaymentHistoryWithfilter = (fromDate, toDate) => {
+    console.log("in function fetch fetchPaymentHistoryWithfilter in context");
+    return GetPaymentHistoryWithFilter(fromDate, toDate);
   };
 
   const AddNewPaymentHistory = (paymentHistory) => {
@@ -71,7 +82,6 @@ export const PaymentHistoryContextProvider = ({ children }) => {
       paymentHistory.dealerId
     );
     return AddPaymentHistory(paymentHistory);
-      
   };
   return (
     <PaymentHistoryContext.Provider
@@ -83,6 +93,8 @@ export const PaymentHistoryContextProvider = ({ children }) => {
         sucess,
         fetchPaymentHistoryByDealerId,
         fetchPaymentHistory,
+        fetchPaymentHistoryWithfilter,
+        paymentHistoryWithFilter,
         AddNewPaymentHistory,
       }}
     >

@@ -16,6 +16,7 @@
     "expo": "47",
     "expo-cli": "^6.3.7",
     "expo-constants": "~14.0.2",
+    "expo-file-system": "^15.2.2",
     "expo-print": "^12.2.1",
     "expo-sharing": "^11.2.2",
     "expo-status-bar": "~1.4.4",

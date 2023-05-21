@@ -26,12 +26,11 @@ export const GetOrderHistoryByDealerId = (d_id) => {
 };
 
 export const GetOrderHistory = () => {
-  console.log(
-    "in service GetOrderHistory");
+  console.log("in service GetOrderHistory");
   const db = getFirestore();
   const colref = collection(db, "orders");
   var now = new Date();
-  const thirtyDayAgo = new Date().setDate(now.getDate()-30);
+  const thirtyDayAgo = new Date().setDate(now.getDate() - 30);
   console.log(thirtyDayAgo.valueOf());
 
   const q = query(
@@ -42,6 +41,18 @@ export const GetOrderHistory = () => {
   return getDocs(q);
 };
 
+export const GetOrderHistoryWithFilter = (fromDate, toDate) => {
+  console.log("in service GetOrderHistoryWithFilter");
+  const db = getFirestore();
+  const colref = collection(db, "orders");
+  const q = query(
+    colref,
+    where("orderDateTimestampString", ">=", fromDate.valueOf()),
+    where("orderDateTimestampString", "<", toDate.valueOf()),
+    orderBy("orderDateTimestampString", "desc")
+  );
+  return getDocs(q);
+};
 
 export const AddNewOrderService = (newOrder) => {
   console.log(
