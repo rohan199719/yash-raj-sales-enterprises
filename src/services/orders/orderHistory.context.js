@@ -23,6 +23,12 @@ export const OrderHistoryContextProvider = ({ children }) => {
   const [addNewOrderApiCallInprogress, setAddNewOrderApiCallInprogress] =
     useState(false);
 
+  const fetchOrderHistoryByDealerIdWithFilter = (dealerId) => {
+    console.log(
+      "in function fetch fetchOrderHistoryByDealerIdWithFilter in context dealer id ",
+      dealerId
+    );
+  };
   const fetchOrderHistoryByDealerId = (dealerId) => {
     setIsOrderHistoryCallLoading(true);
     console.log(
@@ -111,6 +117,7 @@ export const OrderHistoryContextProvider = ({ children }) => {
         orderHistoryCallsucess,
         fetchOrderHistory,
         fetchOrderHistoryWithfilter,
+        fetchOrderHistoryByDealerIdWithFilter,
       }}
     >
       {children}

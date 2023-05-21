@@ -1,6 +1,8 @@
 import { StatusBar } from "expo-status-bar";
 import { useContext, useState, useEffect } from "react";
 import { List } from "react-native-paper";
+import { Foundation } from "@expo/vector-icons";
+import ExportDealerOverlay from "../components/exportDealerOverlay";
 import {
   StyleSheet,
   View,
@@ -30,6 +32,7 @@ import {
   DetailsView,
   AddPaymentButton,
   AddOrderButton,
+  ExportDealerHistoryButton,
   Divider,
   DividertertiarySmall,
   CustomTabView,
@@ -54,26 +57,32 @@ export default function DealerDetails({ navigation, route }) {
     isOrderHistoryCallLoading,
     orderHistoryCallError,
     orderHistoryCallsucess,
-    fetchOrderHistoryByDealerId
+    fetchOrderHistoryByDealerId,
   } = useContext(OrderHistoryContext);
   const fetchOrderHistory = (id) => {
     setOrderHistoryClicked(true);
     setButttonSelected("orderHistory");
-   // renderTaost();
+    // renderTaost();
     console.log("isOrderHistoryCallLoading is :", isOrderHistoryCallLoading);
     console.log("orderListRender flag  is :", orderListRenderFlag);
-   
-    if(orderHistoryDealerSpecific!=null && orderHistoryDealerSpecific.length>0 && orderHistoryDealerSpecific[0].dealerId==id){
+
+    if (
+      orderHistoryDealerSpecific != null &&
+      orderHistoryDealerSpecific.length > 0 &&
+      orderHistoryDealerSpecific[0].dealerId == id
+    ) {
       console.log("order history already fetched ,skipping db call ");
-      console.log("Already fetched order history is",orderHistoryDealerSpecific);
-    }else{
+      console.log(
+        "Already fetched order history is",
+        orderHistoryDealerSpecific
+      );
+    } else {
       console.log("fetching order hitory from db");
       fetchOrderHistoryByDealerId(id);
     }
-    
+
     console.log("orderListRender flag  is :", orderListRenderFlag);
     console.log("isOrderHistoryCallLoading is :", isOrderHistoryCallLoading);
-   
   };
   const renderCustomTaost = (message) => {
     if (Platform.OS === "android") {
@@ -116,64 +125,78 @@ export default function DealerDetails({ navigation, route }) {
   const [orderHistoryClicked, setOrderHistoryClicked] = useState(false);
   const [AddPaymentOverlayOpened, setAddPaymentOverlayOpened] = useState(false);
   const [AddOrderOverlayOpened, setAddOrderOverlayOpened] = useState(false);
+  const [exportPaymentOverlayOpenFlag, setExportPaymentOverlayOpenFlag] =
+    useState(false);
   useEffect(() => {
-  
     fetchPaymentHistoryByDealerId(dealer.dealerId);
+    fetchOrderHistoryByDealerId(dealer.dealerId);
     console.log("dealer detail loaded, fetch payment called");
   }, []);
   const fetchPaymentHistory = (id) => {
     setPaymentHistoryClicked(true);
     setButttonSelected("paymentHistory");
-      console.log("isloading is :", isLoading);
-      console.log("paymentListRender flag  is :", paymentListRenderFlag);
-      if(paymentHistoryDealerSpecific!=null && paymentHistoryDealerSpecific.length>0 && paymentHistoryDealerSpecific[0].dealerId==id){
-        console.log("payment history already fetched ,skipping db call ");
-        console.log("Already fetched payment history is",paymentHistoryDealerSpecific);
-      }else{
-        console.log("fetching order history from db");
-        fetchPaymentHistoryByDealerId(id);
-      }
-      console.log("paymentListRender flag  is :", paymentListRenderFlag);
-      console.log("isloading is :", isLoading);
-    
-   
+    console.log("isloading is :", isLoading);
+    console.log("paymentListRender flag  is :", paymentListRenderFlag);
+    if (
+      paymentHistoryDealerSpecific != null &&
+      paymentHistoryDealerSpecific.length > 0 &&
+      paymentHistoryDealerSpecific[0].dealerId == id
+    ) {
+      console.log("payment history already fetched ,skipping db call ");
+      console.log(
+        "Already fetched payment history is",
+        paymentHistoryDealerSpecific
+      );
+    } else {
+      console.log("fetching order history from db");
+      fetchPaymentHistoryByDealerId(id);
+    }
+    console.log("paymentListRender flag  is :", paymentListRenderFlag);
+    console.log("isloading is :", isLoading);
   };
   const submitNewPayment = (paymentHistory) => {
     console.log("inside submitNewPayment");
     //fetchPaymentHistoryByDealerId(dealer.dealerId);
     AddNewPaymentHistory(paymentHistory)
-    .then(() => {
-      console.log("payment add sucess");
-    togglePaymentOverlay();
-    renderCustomTaost("payment added sucessfully");
-    console.log("payment history after additing payment is", paymentHistory);
-    if (paymentHistoryDealerSpecific != null && paymentHistoryDealerSpecific.length > 0) {
-      console.log("finalizing last payment date");
-      if(paymentHistoryDealerSpecific[0].paymentDateTimestamp>paymentHistory.paymentDateTimestamp){
-        dealer.lastPaymentDate = paymentHistoryDealerSpecific[0].paymentDate;
-      }else{
-        dealer.lastPaymentDate = paymentHistory.paymentDate;
-      }
-    }else{
-      dealer.lastPaymentDate = paymentHistory.paymentDate;
-    }
-    console.log("last payment date is ", dealer.lastPaymentDate);
-    updateDelearDueAmountById(dealer);
-    console.log("dealer info uploaded after payment add");
-    console.log("is loading is " + isLoading);
-    fetchPaymentHistoryByDealerId(dealer.dealerId);
-    })
-    .catch((e) => {
-      console.log("ERROR WHILE ADDING PAYMENT- "+e);
-      if(e.toString().includes("permission-denied")){
-        renderErrorToast("Permisson denied");
-      }else{
-        renderErrorToast("ERROR WHILE ADDING PAYMENT- "+e);
-      }
-      
-    });
-    
-
+      .then(() => {
+        console.log("payment add sucess");
+        togglePaymentOverlay();
+        renderCustomTaost("payment added sucessfully");
+        console.log(
+          "payment history after additing payment is",
+          paymentHistory
+        );
+        if (
+          paymentHistoryDealerSpecific != null &&
+          paymentHistoryDealerSpecific.length > 0
+        ) {
+          console.log("finalizing last payment date");
+          if (
+            paymentHistoryDealerSpecific[0].paymentDateTimestamp >
+            paymentHistory.paymentDateTimestamp
+          ) {
+            dealer.lastPaymentDate =
+              paymentHistoryDealerSpecific[0].paymentDate;
+          } else {
+            dealer.lastPaymentDate = paymentHistory.paymentDate;
+          }
+        } else {
+          dealer.lastPaymentDate = paymentHistory.paymentDate;
+        }
+        console.log("last payment date is ", dealer.lastPaymentDate);
+        updateDelearDueAmountById(dealer);
+        console.log("dealer info uploaded after payment add");
+        console.log("is loading is " + isLoading);
+        fetchPaymentHistoryByDealerId(dealer.dealerId);
+      })
+      .catch((e) => {
+        console.log("ERROR WHILE ADDING PAYMENT- " + e);
+        if (e.toString().includes("permission-denied")) {
+          renderErrorToast("Permisson denied");
+        } else {
+          renderErrorToast("ERROR WHILE ADDING PAYMENT- " + e);
+        }
+      });
   };
   const submitNewPaymentPrev = (paymentHistory) => {
     console.log("inside submitNewPayment");
@@ -204,9 +227,9 @@ export default function DealerDetails({ navigation, route }) {
     console.log("inside togle method");
     console.log(
       "deleare details re-rendered, payment list flag is :" +
-      paymentListRenderFlag +
-      "Button selected is :" +
-      ButttonSelected
+        paymentListRenderFlag +
+        "Button selected is :" +
+        ButttonSelected
     );
     setAddPaymentOverlayOpened(!AddPaymentOverlayOpened);
   };
@@ -214,14 +237,19 @@ export default function DealerDetails({ navigation, route }) {
     console.log("inside togle order overlay method");
     console.log(
       "deleare details re-rendered, paymentlist flag is :" +
-      paymentListRenderFlag +
-      "Button selected is :" +
-      ButttonSelected
+        paymentListRenderFlag +
+        "Button selected is :" +
+        ButttonSelected
     );
     setAddOrderOverlayOpened(!AddOrderOverlayOpened);
   };
-  const paymentListRenderFlag = ButttonSelected === "paymentHistory" && !isLoading;
-  const orderListRenderFlag = ButttonSelected === "orderHistory" && !isOrderHistoryCallLoading;
+  const toggleExportDealerOverlay = () => {
+    setExportPaymentOverlayOpenFlag(!exportPaymentOverlayOpenFlag);
+  };
+  const paymentListRenderFlag =
+    ButttonSelected === "paymentHistory" && !isLoading;
+  const orderListRenderFlag =
+    ButttonSelected === "orderHistory" && !isOrderHistoryCallLoading;
   const LoadingIndicatorRenderFlag = isLoading || isOrderHistoryCallLoading;
   return (
     <MainView>
@@ -269,6 +297,17 @@ export default function DealerDetails({ navigation, route }) {
             Add Order
           </Text> */}
         </AddOrderButton>
+        <ExportDealerHistoryButton onPress={toggleExportDealerOverlay}>
+          <Foundation name="page-export-pdf" size={30} color="#DCEDC8" />
+          {/* <Text
+            variant="caption_tertiary"
+            color="#DCEDC8"
+            adjustsFontSizeToFit
+            numberOfLines={1}
+          >
+            Export
+          </Text> */}
+        </ExportDealerHistoryButton>
       </MiddleView>
       <Divider />
       <CustomTabView>
@@ -310,7 +349,10 @@ export default function DealerDetails({ navigation, route }) {
             </View>
           )}
         </TouchableOpacity>
-        <TouchableOpacity style={{ flex: 1 }} onPress={()=>fetchOrderHistory(dealer.dealerId)}>
+        <TouchableOpacity
+          style={{ flex: 1 }}
+          onPress={() => fetchOrderHistory(dealer.dealerId)}
+        >
           {ButttonSelected === "orderHistory" ? (
             <View
               style={{
@@ -353,7 +395,12 @@ export default function DealerDetails({ navigation, route }) {
 
           <ScrollView>
             {paymentHistoryDealerSpecific.map((item) => {
-              return <PaymentHistoryInfo paymentDetails={item} key={item.paymentDateTimestampString}/>;
+              return (
+                <PaymentHistoryInfo
+                  paymentDetails={item}
+                  key={item.paymentDateTimestampString}
+                />
+              );
             })}
           </ScrollView>
         </>
@@ -378,39 +425,40 @@ export default function DealerDetails({ navigation, route }) {
         )
       )}
 
-  {orderListRenderFlag ? (
+      {orderListRenderFlag ? (
         <>
           <DividertertiarySmall />
 
           <ScrollView>
             {orderHistoryDealerSpecific.map((item) => {
-              return <OrderHistoryInfo orderDetails={item} key={item.orderDateTimestampString} />;
+              return (
+                <OrderHistoryInfo
+                  orderDetails={item}
+                  key={item.orderDateTimestampString}
+                />
+              );
             })}
           </ScrollView>
         </>
-      ) : (
-        // <FlatList
-        //   data={paymentHistory}
-        //   renderItem={({ item }) => {
-        //     console.log(
-        //       "payment date is",
-        //       new Date(item.paymentDateTimestamp.seconds * 1000)
-        //     );
-        //     return <PaymentHistoryInfo paymentDetails={item} />;
-        //   }}
-        //   keyExtractor={(item) => item.pmtId}
-        // />
-        // LoadingIndicatorRenderFlag && (
-        //   <ActivityIndicator
-        //     style={{ marginTop: 8 }}
-        //     size="large"
-        //     color="#138000"
-        //   />
-        // )
-        null
-      )}
-
-
+      ) : // <FlatList
+      //   data={paymentHistory}
+      //   renderItem={({ item }) => {
+      //     console.log(
+      //       "payment date is",
+      //       new Date(item.paymentDateTimestamp.seconds * 1000)
+      //     );
+      //     return <PaymentHistoryInfo paymentDetails={item} />;
+      //   }}
+      //   keyExtractor={(item) => item.pmtId}
+      // />
+      // LoadingIndicatorRenderFlag && (
+      //   <ActivityIndicator
+      //     style={{ marginTop: 8 }}
+      //     size="large"
+      //     color="#138000"
+      //   />
+      // )
+      null}
 
       {AddPaymentOverlayOpened && (
         <AddPaymentFormOverlay
@@ -423,6 +471,14 @@ export default function DealerDetails({ navigation, route }) {
         <AddOrderFormOverlay
           toggleOrderOverlay={toggleOrderOverlay}
           dealer={dealer}
+        />
+      )}
+      {exportPaymentOverlayOpenFlag && (
+        <ExportDealerOverlay
+          toggleExportDealerOverlay={toggleExportDealerOverlay}
+          dealer={dealer}
+          paymentHistoryDealerSpecific={paymentHistoryDealerSpecific}
+          orderHistoryDealerSpecific={orderHistoryDealerSpecific}
         />
       )}
     </MainView>

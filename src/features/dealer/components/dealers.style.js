@@ -64,7 +64,7 @@ export const BottomView = styled(View)`
 export const MiddleView = styled(View)`
   height: 128px;
   flex-direction: row;
-  justify-content: flex-start;
+  justify-content: space-evenly;
   align-items: center;
   background-color: ${(props) => props.theme.colors.ui.tertiary};
 `;
@@ -100,6 +100,18 @@ margin-horizontal:8px;
   elevation:8
 `;
 export const AddOrderButton = styled(TouchableOpacity)`
+height:80px;
+width:80px;
+margin-horizontal:8px;
+  justify-content: center;
+  align-items: center;
+  border-radius:40px
+  background-color:${(props) => props.theme.colors.ui.primary};
+  border-width:4px;
+  border-color:#388E3C;
+  elevation:8
+`;
+export const ExportDealerHistoryButton = styled(TouchableOpacity)`
 height:80px;
 width:80px;
 margin-horizontal:8px;

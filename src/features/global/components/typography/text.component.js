@@ -70,6 +70,11 @@ const caption_white = (theme) => `
     font-weight: ${theme.fontWeights.bold};
     color: ${theme.colors.text.inverse};
 `;
+const caption_tertiary = (theme) => `
+    font-size: ${theme.fontSizes.caption};
+    font-weight: ${theme.fontWeights.bold};
+    color: ${theme.colors.ui.tertiary};
+`;
 
 const variants = {
   title,
@@ -81,6 +86,7 @@ const variants = {
   inputlabel,
   caption,
   caption_white,
+  caption_tertiary,
   captionMedium,
   error,
   hint,

@@ -18,6 +18,13 @@ export const PaymentHistoryContextProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [sucess, setSucess] = useState(false);
 
+  const fetchPaymentHistoryByDealerIdWithFilter = (dealerId) => {
+    console.log(
+      "in function fetch fetchPaymentHistoryByDealerIdWithFilter in context dealer id ",
+      dealerId
+    );
+  };
+
   const fetchPaymentHistoryByDealerId = (dealerId) => {
     setIsLoading(true);
     console.log(
@@ -96,6 +103,7 @@ export const PaymentHistoryContextProvider = ({ children }) => {
         fetchPaymentHistoryWithfilter,
         paymentHistoryWithFilter,
         AddNewPaymentHistory,
+        fetchPaymentHistoryByDealerIdWithFilter,
       }}
     >
       {children}
